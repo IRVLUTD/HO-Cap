@@ -2,17 +2,22 @@
 
 ## Environment Setup
 
-1. Create conda environment
+1. Clone the repository
+```bash
+git clone --recurse-submodules git@github.com:IRVLUTD/HO-Cap.git
+```
+
+2. Create conda environment
 ```bash
 conda create -n ho-cap python=3.10
 ```
 
-2. Activate conda environment
+3. Activate conda environment
 ```bash
 conda activate ho-cap
 ```
 
-3. Install dependencies
+4. Install dependencies ([CUDA 11.8](https://developer.nvidia.com/cuda-11-8-0-download-archive) needed)
 ```bash
 # install dependencies from requirements.txt
 python -m pip install --no-cache-dir -r requirements.txt
@@ -34,4 +39,18 @@ python -m pip install --quiet --no-cache-dir git+https://github.com/ChaoningZhan
 
 # build manopath and meshsdf_loss
 bash build.sh
+```
+5. Download models for external libraries
+```bash
+# download model for LoFTR
+bash config/LoFTR/download_loftr_model.sh
+
+# download model for MediaPipe
+bash config/Mediapipe/download_mediapipe_model.sh
+
+# download model for SAM
+bash config/SAM/download_sam_model.sh
+
+# download model for XMem
+bash config/XMem/download_xmem_model.sh
 ```
