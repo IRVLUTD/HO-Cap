@@ -1,0 +1,6 @@
+[submodule "external/XMem"]
+	path = external/XMem
+	url = git@github.com:hkchengrex/XMem.git
+[submodule "external/LoFTR"]
+	path = external/LoFTR
+	url = git@github.com:zju3dv/LoFTR.git
