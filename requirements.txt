@@ -1,3 +1,11 @@
+casadi
+transforms3d
+xacro
+urdf-parser-py
+osqp
+cvxopt
+vtk
+
 # PyTorch 2.1.1
 --extra-index-url https://download.pytorch.org/whl/cu118
 torch==2.1.1+cu118
