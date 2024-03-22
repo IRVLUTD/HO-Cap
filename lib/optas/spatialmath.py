@@ -101,6 +101,22 @@ def angvec2r(theta: ArrayType, v: ArrayType) -> CasADiArrayType:
 
 
 @arrayify_args
+def r2angvec(R: ArrayType) -> CasADiArrayType:
+    """! Convert rotation matrix to axis angle.
+
+    @param R A 3-by-3 rotation matrix.
+    @return Homogenous transformation with given rotation and zero translation.
+    """
+
+    theta = cs.acos((cs.trace(R) - 1) / 2)
+    v1 = (1 / (2 * cs.sin(theta))) * (R[2, 1] - R[1, 2])
+    v2 = (1 / (2 * cs.sin(theta))) * (R[0, 2] - R[2, 0])
+    v3 = (1 / (2 * cs.sin(theta))) * (R[1, 0] - R[0, 1])
+    v = cs.horzcat(v1, v2, v3)
+    return theta * v
+
+
+@arrayify_args
 def r2t(R: ArrayType) -> CasADiArrayType:
     """! Convert rotation matrix to a homogeneous transform.
 

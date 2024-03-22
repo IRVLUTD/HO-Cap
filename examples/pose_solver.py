@@ -10,7 +10,7 @@ from transforms3d.quaternions import mat2quat
 from _init_paths import *
 import lib.optas as optas
 from lib.optas.models import TaskModel
-from lib.optas.spatialmath import Quaternion
+from lib.optas.spatialmath import angvec2r, r2angvec
 
 
 class SDFTaskModel(TaskModel):
@@ -28,8 +28,8 @@ class SDFTaskModel(TaskModel):
         ):
         
         super().__init__(name, dim, time_derivs, symbol, dlim, T, is_discrete)
-        self.field_margin = 0.4
-        self.grid_resolution = 0.02
+        self.field_margin = 0.1
+        self.grid_resolution = 0.01
 
 
     def setup_points_field(self, points):
@@ -87,34 +87,27 @@ class PoseSolver:
         # get robot state variables
         q_T = builder.get_model_states(self.task_name)
 
-        # quaternion
-        x = q_T[0]
-        y = q_T[1]
-        z = q_T[2]
-        w = q_T[3]
-        quat = Quaternion(x, y, z, w)
-
-        # rotation matrix
-        R = quat.getrotm()
+        # axis-angle to rotation matrix
+        rv = q_T[:3]
+        angle = optas.norm_2(rv)
+        axis = rv / angle
+        R = angvec2r(angle, axis)
 
         # Setting optimization - cost term and constraints
-        points_tf = R @ object_points.T + q_T[4:].reshape((3, 1))
+        points_tf = R @ object_points.T + q_T[3:].reshape((3, 1))
         offsets = self.task_model.points_to_offsets(points_tf.T)
         builder.add_cost_term("sdf_cost", optas.sumsqr(sdf_cost[offsets]))
 
         # setup solver
-        solver_options = {'ipopt': {'max_iter': 50, 'tol': 1e-150}}
+        solver_options = {'ipopt': {'max_iter': 50, 'tol': 1e-15}}
         self.solver = optas.CasADiSolver(builder.build()).setup("ipopt", solver_options=solver_options)    
 
 
     def solve_pose(self, RT, object_points, sdf_cost):
-        w, x, y, z = mat2quat(RT[:3, :3])
-        x0 = np.zeros((7,), dtype=np.float32)
-        x0[0] = x
-        x0[1] = y
-        x0[2] = z
-        x0[3] = w
-        x0[4:] = RT[:3, 3]
+        rv = r2angvec(RT[:3, :3])
+        x0 = np.zeros((6, ), dtype=np.float32)
+        x0[:3] = rv
+        x0[3:] = RT[:3, 3]
         self.solver.reset_initial_seed({f"{self.task_name}/y/x": x0})
 
         self.solver.reset_parameters({"sdf_cost": optas.DM(sdf_cost),
@@ -153,16 +146,17 @@ if __name__ == "__main__":
         [ 0.,          0.,          0.,          1.        ]])   
     
     name = 'object_pose_estimator'
-    dim = 7
+    dim = 6
     task_model = SDFTaskModel(name, dim)
 
     # fake points
-    points = np.random.randn(100, 3)
+    num_points = 100
+    points = np.random.randn(num_points, 3)
     task_model.setup_points_field(points)
 
     # solve problem
     pose_solver = PoseSolver(task_model)
-    pose_solver.setup_optimization()
+    pose_solver.setup_optimization(num_points)
 
     sdf_cost = np.random.randn(task_model.field_size)
     y_solution = pose_solver.solve_pose(RT, points, sdf_cost)

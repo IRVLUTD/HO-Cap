@@ -9,8 +9,8 @@ from lib.utils import *
 from lib.utils.common import mat_to_rvt
 from lib.mesh_to_sdf import get_surface_point_cloud
 from lib.optas.visualize import Visualizer
+from lib.optas.spatialmath import angvec2r
 from lib.layers.object_layer import ObjectLayer
-from lib.layers.meshsdf_loss import MeshSDFLoss
 from pose_solver import SDFTaskModel, PoseSolver
 
 """
@@ -33,9 +33,7 @@ class MyLoader:
         self.poses = self.load_poses()
         self.points = self.load_points()
         self.cloud, self.object_mesh, self.mesh_file = self.init_object_point_cloud()
-        self.object_layer = self.init_object_layer()
-        self.field_margin = 0.4
-        self.grid_resolution = 0.05        
+        self.object_layer = self.init_object_layer()       
 
         self.num_frames = len(self.points)
 
@@ -72,7 +70,7 @@ if __name__ == "__main__":
 
     # task model
     name = 'object_pose_estimator'
-    dim = 7
+    dim = 6
     task_model = SDFTaskModel(name, dim)
     points = loader.cloud.points
     task_model.setup_points_field(points)
@@ -85,44 +83,55 @@ if __name__ == "__main__":
     # pose solver
     pose_solver = PoseSolver(task_model)
 
+    # initial pose
+    pose_0 = loader.poses[0].unsqueeze(0)
+    RT = np.eye(4, dtype=np.float32)
+    rv = pose_0[0, :3].cpu().numpy()
+    angle = np.linalg.norm(rv)
+    axis = rv / angle
+    RT[:3, :3] = angvec2r(angle, axis)
+    RT[:3, 3] = pose_0[:, 3:].cpu().numpy()
+    RT_before = RT.copy()
+
     # optimize the pose
     for frame_id in range(0, loader.num_frames, 50):
-        pose_0 = loader.poses[frame_id].unsqueeze(0)
+        # object points
         dpts = loader.points[frame_id]
 
-        # construct pose
-        RT = np.eye(4, dtype=np.float32)
-        RT[:3, :3] = loader.object_layer.rv2dcm(pose_0[:, :3])[0].cpu().numpy()
-        RT[:3, 3] = pose_0[:, 3:].cpu().numpy()
-        print('before', RT, RT.shape)
-
         # solve pose
-        RT_inv = np.linalg.inv(RT)
+        RT_inv = np.linalg.inv(RT_before)
         points = dpts.cpu().numpy()
         pose_solver.setup_optimization(num_points=points.shape[0])   
         y = pose_solver.solve_pose(RT_inv, points, sdf_cost)
 
         # construct RT
-        RT[:3, :3] = quat2mat([y[3], y[0], y[1], y[2]])
-        RT[:3, 3] = y[4:]
+        angle = np.linalg.norm(y[:3])
+        axis = y[:3] / angle
+        RT[:3, :3] = angvec2r(angle, axis)        
+        RT[:3, 3] = y[3:]
         RT = np.linalg.inv(RT)
-        print('after', RT, RT.shape)
+        print('before:')
+        print(RT_before)
+        print('after:')
+        print(RT)
+        RT_before = RT.copy()
         
-        # visualization
-        quat = mat2quat(RT[:3, :3])
-        # scalar-last (x, y, z, w) format in optas
-        orientation = [quat[1], quat[2], quat[3], quat[0]]
-
+        # visualize
+        RT_inv = np.linalg.inv(RT)
+        points_tf = RT_inv[:3, :3] @ points.T + RT_inv[:3, 3].reshape((3, 1))
         vis = Visualizer(camera_position=[3, 2, 4])
         vis.grid_floor()
         vis.obj(
             loader.mesh_file,
-            position=RT[:3, 3],
-            orientation=orientation,            
         )
+        # vis.points(
+        #     world_points,
+        #     rgb = [0, 1, 0],
+        #     size=1,
+        # )
         vis.points(
-            dpts.cpu().numpy(),
+            points_tf.T,
             rgb = [1, 0, 0],
             size=5,
-        )        
-        vis.start()
+        )              
+        vis.start()    
