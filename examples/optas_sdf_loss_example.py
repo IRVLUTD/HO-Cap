@@ -83,9 +83,14 @@ if __name__ == "__main__":
 
     # pose solver
     pose_solver = PoseSolver(task_model, sdf_cost)
+    # sample 5000 points for optimization, we need to setup optimization with fixed number of points
+    num_points = 5000
+    pose_solver.setup_optimization(num_points)
+    print('finish setup optimization')
 
     # initial pose
-    pose_0 = loader.poses[0].unsqueeze(0)
+    start = 0
+    pose_0 = loader.poses[start].unsqueeze(0)
     RT = np.eye(4, dtype=np.float32)
     rv = pose_0[0, :3].cpu().numpy()
     angle = np.linalg.norm(rv)
@@ -95,15 +100,18 @@ if __name__ == "__main__":
     RT_before = RT.copy()
 
     # optimize the pose
-    for frame_id in range(0, loader.num_frames, 50):
+    for frame_id in range(start, loader.num_frames, 50):
         # object points
         dpts = loader.points[frame_id]
 
         # solve pose
         RT_inv = np.linalg.inv(RT_before)
         points = dpts.cpu().numpy()
-        pose_solver.setup_optimization(num_points=points.shape[0])   
-        y = pose_solver.solve_pose(RT_inv, points)
+        print('frame %d, num points %d' % (frame_id, points.shape[0]))
+
+        # sample points
+        index = np.random.choice(points.shape[0], size=num_points, replace=True)
+        y = pose_solver.solve_pose(RT_inv, points[index])
 
         # construct RT
         angle = np.linalg.norm(y[:3])
