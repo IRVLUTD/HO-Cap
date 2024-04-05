@@ -37,6 +37,9 @@ class SDFTaskModel(TaskModel):
         self.workspace_bounds = np.stack((points.min(0), points.max(0)), axis=1)
         margin = self.field_margin
         self.origin = np.array([self.workspace_bounds[0][0] - margin, self.workspace_bounds[1][0] - margin, self.workspace_bounds[2][0] - margin]).reshape((1, 3))
+        self.xgrid = np.arange(self.workspace_bounds[0][0] - margin, self.workspace_bounds[0][1] + margin, self.grid_resolution)
+        self.ygrid = np.arange(self.workspace_bounds[1][0] - margin, self.workspace_bounds[1][1] + margin, self.grid_resolution)
+        self.zgrid = np.arange(self.workspace_bounds[2][0] - margin, self.workspace_bounds[2][1] + margin, self.grid_resolution)
         workspace_points = np.array(np.meshgrid(
                                 np.arange(self.workspace_bounds[0][0] - margin, self.workspace_bounds[0][1] + margin, self.grid_resolution),
                                 np.arange(self.workspace_bounds[1][0] - margin, self.workspace_bounds[1][1] + margin, self.grid_resolution),
@@ -69,9 +72,12 @@ class SDFTaskModel(TaskModel):
 
 class PoseSolver:
 
-    def __init__(self, task_model):
+    def __init__(self, task_model, sdf_cost):
         self.task_model = task_model
         self.task_name = self.task_model.name
+
+        data_flat = sdf_cost.ravel(order="F")
+        self.lut = cs.interpolant('lut', 'linear', [task_model.xgrid, task_model.ygrid, task_model.zgrid], data_flat)
 
 
     def setup_optimization(self, num_points):
@@ -81,8 +87,6 @@ class PoseSolver:
         # setup parameters
         # object points for SDF optimization
         object_points = builder.add_parameter("object_points", num_points, 3)
-        # sdf field
-        sdf_cost = builder.add_parameter("sdf_cost", self.task_model.field_size)
         
         # get robot state variables
         q_T = builder.get_model_states(self.task_name)
@@ -95,23 +99,24 @@ class PoseSolver:
 
         # Setting optimization - cost term and constraints
         points_tf = R @ object_points.T + q_T[3:].reshape((3, 1))
-        offsets = self.task_model.points_to_offsets(points_tf.T)
-        builder.add_cost_term("sdf_cost", optas.sumsqr(sdf_cost[offsets]))
+        cost = cs.MX.zeros(num_points)
+        for i in range(num_points):
+            cost[i] = self.lut(points_tf[:, i])
+        builder.add_cost_term("sdf_cost", optas.sumsqr(cost))
 
         # setup solver
         solver_options = {'ipopt': {'max_iter': 50, 'tol': 1e-15}}
         self.solver = optas.CasADiSolver(builder.build()).setup("ipopt", solver_options=solver_options)    
 
 
-    def solve_pose(self, RT, object_points, sdf_cost):
+    def solve_pose(self, RT, object_points):
         rv = r2angvec(RT[:3, :3])
         x0 = np.zeros((6, ), dtype=np.float32)
         x0[:3] = rv
         x0[3:] = RT[:3, 3]
         self.solver.reset_initial_seed({f"{self.task_name}/y/x": x0})
 
-        self.solver.reset_parameters({"sdf_cost": optas.DM(sdf_cost),
-                                    "object_points": optas.DM(object_points)})
+        self.solver.reset_parameters({"object_points": optas.DM(object_points)})
                   
         solution = self.solver.solve()
         y = solution[f"{self.task_name}/y"]
@@ -120,43 +125,3 @@ class PoseSolver:
         print("Casadi SDF pose solution:")
         print(y, y.shape)
         return y.toarray().flatten()
-
-
-def make_args():
-    parser = argparse.ArgumentParser(
-        description="Generate grid and spawn objects", add_help=True
-    )
-    parser.add_argument(
-        "-r",
-        "--robot",
-        type=str,
-        default="panda",
-        help="Robot name",
-    )
-    args = parser.parse_args()
-    return args
-
-
-if __name__ == "__main__":
-    args = make_args()
-
-    RT = np.array([[-0.05241979, -0.45344928, -0.88973933,  0.41363978],
-        [-0.27383122, -0.8502871,   0.44947574,  0.12551154],
-        [-0.96034825,  0.26719978, -0.07959669,  0.97476065],
-        [ 0.,          0.,          0.,          1.        ]])   
-    
-    name = 'object_pose_estimator'
-    dim = 6
-    task_model = SDFTaskModel(name, dim)
-
-    # fake points
-    num_points = 100
-    points = np.random.randn(num_points, 3)
-    task_model.setup_points_field(points)
-
-    # solve problem
-    pose_solver = PoseSolver(task_model)
-    pose_solver.setup_optimization(num_points)
-
-    sdf_cost = np.random.randn(task_model.field_size)
-    y_solution = pose_solver.solve_pose(RT, points, sdf_cost)

@@ -43,7 +43,6 @@ class SurfacePointCloud:
         else:
             distances, indices = self.kd_tree.query(query_points, k=sample_count)
             distances = distances.astype(np.float32)
-
             closest_points = self.points[indices]
             direction_from_surface = query_points[:, np.newaxis, :] - closest_points
             inside = np.einsum('ijk,ijk->ij', direction_from_surface, self.normals[indices]) < 0

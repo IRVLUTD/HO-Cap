@@ -2,7 +2,6 @@ import numpy as np
 from tqdm import tqdm
 import trimesh
 import torch
-from transforms3d.quaternions import mat2quat, quat2mat
 
 from _init_paths import *
 from lib.utils import *
@@ -12,6 +11,7 @@ from lib.optas.visualize import Visualizer
 from lib.optas.spatialmath import angvec2r
 from lib.layers.object_layer import ObjectLayer
 from pose_solver import SDFTaskModel, PoseSolver
+
 
 """
 The MeshSDFLoss will return three values:
@@ -73,15 +73,16 @@ if __name__ == "__main__":
     dim = 6
     task_model = SDFTaskModel(name, dim)
     points = loader.cloud.points
+    normals = loader.cloud.normals
     task_model.setup_points_field(points)
 
     # sdf field
     world_points = task_model.workspace_points
     sdf_cost = loader.cloud.get_sdf(world_points)
-    print(sdf_cost, sdf_cost.shape)
+    sdf_cost = sdf_cost.reshape(task_model.field_shape)
 
     # pose solver
-    pose_solver = PoseSolver(task_model)
+    pose_solver = PoseSolver(task_model, sdf_cost)
 
     # initial pose
     pose_0 = loader.poses[0].unsqueeze(0)
@@ -102,7 +103,7 @@ if __name__ == "__main__":
         RT_inv = np.linalg.inv(RT_before)
         points = dpts.cpu().numpy()
         pose_solver.setup_optimization(num_points=points.shape[0])   
-        y = pose_solver.solve_pose(RT_inv, points, sdf_cost)
+        y = pose_solver.solve_pose(RT_inv, points)
 
         # construct RT
         angle = np.linalg.norm(y[:3])
@@ -134,4 +135,4 @@ if __name__ == "__main__":
             rgb = [1, 0, 0],
             size=5,
         )              
-        vis.start()    
+        vis.start()
