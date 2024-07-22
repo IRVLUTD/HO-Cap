@@ -133,20 +133,25 @@ This code is tested with [Python 3.10](https://docs.python.org/3.10) and CUDA 11
 1. Below example shows how to visualize the pose annotations of one frame:
    
    ```bash
-   python examples/sequence_pose_viewer.py --sequence_folder data/subject_1/20231025_165502 --frame_id 0
+   python examples/sequence_pose_viewer.py
    ```
+
+   ![sequence_pose_viewer](./assets/sequence_pose_viewer.png)
 
 2. Below example shows how to visualize sequence by the interactive 3D viewer:
    
    ```bash
-   python examples/sequence_3d_viewer.py --sequence_folder data/subject_1/20231025_165502
+   python examples/sequence_3d_viewer.py
    ```
 
 3. Below example shows how to offline render the sequence:
    
    ```bash
-   python examples/sequence_renderer.py --sequence_folder data/subject_1/20231025_165502
+   python examples/sequence_renderer.py
    ```
+
+   ![sequence_renderer_color](./assets/sequence_renderer_color.png)
+   ![sequence_renderer_mask](./assets/sequence_renderer_mask.png)
 
 4. You can list all the sequence folders (70 in total) with:
    ```

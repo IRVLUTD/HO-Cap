@@ -12,6 +12,7 @@ from scipy.interpolate import CubicSpline, interp1d
 import cv2
 import av
 import matplotlib.pyplot as plt
+from matplotlib.gridspec import GridSpec
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 import trimesh
 import pyrender
@@ -353,12 +354,14 @@ def create_video_from_rgb_images(video_path, rgb_images, fps=30):
     container.close()
 
 
+def get_depth_colormap(image):
+    d_min, d_max = image.min(), image.max()
+    image = (image - d_min) / (d_max - d_min) * 255
+    image = image.astype(np.uint8)
+    return cv2.applyColorMap(image, cv2.COLORMAP_JET)
+
+
 def create_video_from_depth_images(video_path, depth_images, fps=30):
-    def get_depth_colormap(image):
-        d_min, d_max = image.min(), image.max()
-        image = (image - d_min) / (d_max - d_min) * 255
-        image = image.astype(np.uint8)
-        return cv2.applyColorMap(image, cv2.COLORMAP_JET)
 
     height, width = depth_images[0].shape[:2]
 
@@ -627,6 +630,62 @@ def display_images(
 
     if return_array:
         return rgb
+
+
+def display_all_camera_images(
+    images,
+    names=None,
+    cmap="gray",
+    figsize=(19.2, 10.8),
+    dpi=100,
+    facecolor="white",
+    return_array=False,
+):
+    img_array = None
+    num_images = len(images)
+    assert num_images == 9, "Expected exactly 9 images"
+
+    if names is None:
+        names = [f"fig_{i}" for i in range(num_images)]
+
+    fig = plt.figure(figsize=figsize, dpi=dpi, facecolor=facecolor)
+    gs = GridSpec(3, 4, figure=fig)
+
+    # Plot the first eight images in the first two rows
+    for i in range(8):
+        row = i // 4
+        col = i % 4
+        ax = fig.add_subplot(gs[row, col])
+        if images[i].ndim == 3 and images[i].shape[2] == 3:  # RGB images
+            ax.imshow(images[i])
+        else:  # Depth or grayscale images
+            ax.imshow(images[i], cmap=cmap)
+        ax.set_title(names[i])
+        ax.axis("off")
+
+    # Plot the last image centered in the third row
+    center_ax = fig.add_subplot(gs[2, 1:3])
+    if images[8].ndim == 3 and images[8].shape[2] == 3:  # RGB images
+        center_ax.imshow(images[8])
+    else:  # Depth or grayscale images
+        center_ax.imshow(images[8], cmap=cmap)
+    center_ax.set_title(names[8])
+    center_ax.axis("off")
+
+    plt.tight_layout()
+
+    if return_array:
+        canvas = FigureCanvasAgg(fig)
+        canvas.draw()
+        img_array = np.array(canvas.renderer.buffer_rgba())[..., :3]
+
+    if not return_array:
+        plt.show()
+
+    plt.close(fig)
+
+    if return_array:
+        return img_array
 
 
 def get_xyz_from_uvd(u, v, d, fx, fy, cx, cy):

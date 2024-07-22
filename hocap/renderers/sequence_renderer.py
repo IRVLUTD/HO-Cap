@@ -7,11 +7,14 @@ from hocap.loaders import SequenceLoader
 
 
 class SequenceRenderer:
-    def __init__(self, sequence_folder) -> None:
+    def __init__(self, sequence_folder, device="cpu") -> None:
         self._seq_folder = Path(sequence_folder).resolve()
-        self._loader = SequenceLoader(sequence_folder, load_mano=True)
+        self._device = device
+        self._loader = SequenceLoader(sequence_folder, load_mano=True, device=device)
         self._num_frames = self._loader.num_frames
         self._object_ids = self._loader.object_ids
+        self._mano_sides = self._loader.mano_sides
+        self._mano_group_layer = self._loader.mano_group_layer
         # Realsense cameras
         self._rs_serials = self._loader.rs_serials
         self._rs_width = self._loader.rs_width
@@ -29,6 +32,17 @@ class SequenceRenderer:
         self._poses_m = self._load_mano_poses()
         self._poses_pv = self._load_holo_poses()
 
+        # Load object meshes
+        self._obj_meshes = [
+            pyrender.Mesh.from_trimesh(trimesh.load_mesh(f, process=False))
+            for f in self._loader.object_textured_mesh_files
+        ]
+
+        # Get verts, faces, colors for MANO
+        self._mano_verts = self._get_mano_verts()
+        self._mano_faces = self._get_mano_faces()
+        self._mano_colors = self._get_mano_colors()
+
         # Rendering flags
         self._rgb_flags = (
             pyrender.RenderFlags.OFFSCREEN | pyrender.RenderFlags.SHADOWS_ALL
@@ -37,71 +51,6 @@ class SequenceRenderer:
             pyrender.RenderFlags.OFFSCREEN | pyrender.RenderFlags.DEPTH_ONLY
         )
         self._mask_flags = pyrender.RenderFlags.OFFSCREEN | pyrender.RenderFlags.SEG
-
-        # Load object meshes
-        self._obj_meshes = [
-            pyrender.Mesh.from_trimesh(trimesh.load_mesh(f, process=False))
-            for f in self._loader.object_textured_mesh_files
-        ]
-
-        # Set up scene
-        self._create_scene()
-
-    def _create_scene(self):
-        self._scene = pyrender.Scene(
-            bg_color=[0.0, 0.0, 0.0], ambient_light=[1.0, 1.0, 1.0]
-        )
-
-        # Add world node
-        self._world_node = self._scene.add_node(pyrender.Node(name="world"))
-
-        # Add realsense camera nodes
-        self._camera_nodes = {
-            serial: self._scene.add(
-                pyrender.IntrinsicsCamera(
-                    fx=cam_K[0, 0],
-                    fy=cam_K[1, 1],
-                    cx=cam_K[0, 2],
-                    cy=cam_K[1, 2],
-                    znear=0.01,
-                    zfar=10.0,
-                ),
-                parent_node=self._world_node,
-                name=serial,
-                pose=cam_RT @ cvcam_in_glcam,
-            )
-            for serial, cam_K, cam_RT in zip(
-                self._rs_serials, self._rs_intrinsics, self._rs_extrinsics
-            )
-        }
-
-        # Add hololens camera node
-        self._camera_nodes[self._hl_serial] = self._scene.add(
-            pyrender.IntrinsicsCamera(
-                fx=self._hl_pv_intrinsics[0, 0],
-                fy=self._hl_pv_intrinsics[1, 1],
-                cx=self._hl_pv_intrinsics[0, 2],
-                cy=self._hl_pv_intrinsics[1, 2],
-                znear=0.01,
-                zfar=10.0,
-            ),
-            parent_node=self._world_node,
-            name=self._hl_serial,
-            pose=np.eye(4),
-        )
-
-        # Add object nodes
-        self._object_nodes = [
-            self._scene.add(
-                pyrender.Mesh.from_trimesh(trimesh.load_mesh(mesh_file, process=False)),
-                parent_node=self._world_node,
-                name=object_id,
-                pose=np.eye(4),
-            )
-            for object_id, mesh_file in zip(
-                self._object_ids, self._loader.object_textured_mesh_files
-            )
-        ]
 
     def _load_holo_pv_intrinsics(self, serial):
         K = np.fromfile(
@@ -122,6 +71,10 @@ class SequenceRenderer:
     def _load_mano_poses(self):
         pose_file = self._seq_folder / "poses_m.npy"
         poses = np.load(pose_file)
+        poses = [
+            torch.from_numpy(poses[0 if side == "right" else 1]).to(self._device)
+            for side in self._mano_sides
+        ]
         return poses
 
     def _load_holo_poses(self):
@@ -129,206 +82,184 @@ class SequenceRenderer:
         poses = np.linalg.inv(np.load(pose_file))
         return poses
 
+    def _get_mano_verts(self):
+        p = torch.cat(self._poses_m, dim=1)
+        v, _ = self._mano_group_layer(p)
+        if p.size(0) == 1:
+            v = v[0]
+        return v.cpu().numpy()
+
+    def _get_mano_faces(self):
+        mano_faces = [
+            np.concatenate(
+                [
+                    self._mano_group_layer.f.cpu().numpy(),
+                    (
+                        np.array(NEW_MANO_FACES)
+                        if side == "right"
+                        else np.array(NEW_MANO_FACES)[:, ::-1]
+                    ),
+                ]
+            )
+            for side in self._mano_sides
+        ]
+        return mano_faces
+
+    def _get_mano_colors(self):
+        mano_colors = np.stack(
+            [
+                [HAND_COLORS[1].rgb if side == "right" else HAND_COLORS[2].rgb]
+                * NUM_MANO_VERTS
+                for side in self._mano_sides
+            ]
+        )
+        return mano_colors
+
+    def _get_mano_meshes(self, frame_id):
+        meshes = [
+            trimesh.Trimesh(
+                vertices=self._mano_verts[frame_id][
+                    i * NUM_MANO_VERTS : (i + 1) * NUM_MANO_VERTS
+                ],
+                faces=self._mano_faces[i],
+                vertex_colors=self._mano_colors[i],
+                process=False,
+            )
+            for i in range(len(self._mano_sides))
+        ]
+        meshes = [pyrender.Mesh.from_trimesh(mesh) for mesh in meshes]
+        return meshes
+
+    def create_scene(self, frame_id):
+        self._scene = pyrender.Scene(
+            bg_color=[0.0, 0.0, 0.0], ambient_light=[1.0, 1.0, 1.0]
+        )
+
+        # Add world node
+        world_node = self._scene.add_node(pyrender.Node(name="world"))
+
+        # Add realsense camera nodes
+        self._camera_nodes = {
+            serial: self._scene.add(
+                pyrender.IntrinsicsCamera(
+                    fx=cam_K[0, 0],
+                    fy=cam_K[1, 1],
+                    cx=cam_K[0, 2],
+                    cy=cam_K[1, 2],
+                    znear=0.01,
+                    zfar=10.0,
+                ),
+                parent_node=world_node,
+                name=f"cam_{serial}",
+                pose=cam_RT @ cvcam_in_glcam,
+            )
+            for serial, cam_K, cam_RT in zip(
+                self._rs_serials, self._rs_intrinsics, self._rs_extrinsics
+            )
+        }
+
+        # Add hololens camera node
+        self._camera_nodes[self._hl_serial] = self._scene.add(
+            pyrender.IntrinsicsCamera(
+                fx=self._hl_pv_intrinsics[0, 0],
+                fy=self._hl_pv_intrinsics[1, 1],
+                cx=self._hl_pv_intrinsics[0, 2],
+                cy=self._hl_pv_intrinsics[1, 2],
+                znear=0.01,
+                zfar=10.0,
+            ),
+            parent_node=world_node,
+            name=f"cam_{self._hl_serial}",
+            pose=self._poses_pv[frame_id] @ cvcam_in_glcam,
+        )
+
+        # Add object nodes
+        self._object_nodes = [
+            self._scene.add(
+                obj_mesh,
+                parent_node=world_node,
+                name=f"obj_{self._object_ids[i]}",
+                pose=self._poses_o[i, frame_id],
+            )
+            for i, obj_mesh in enumerate(self._obj_meshes)
+        ]
+
+        # Add MANO nodes
+        self._mano_nodes = [
+            self._scene.add(
+                mano_mesh,
+                parent_node=world_node,
+                name=f"mano_{self._mano_sides[i]}",
+                pose=np.eye(4),
+            )
+            for i, mano_mesh in enumerate(self._get_mano_meshes(frame_id))
+        ]
+
+        self._seg_node_map = {}
+        for i, obj_node in enumerate(self._object_nodes):
+            self._seg_node_map[obj_node] = OBJ_CLASS_COLORS[i + 1].rgb
+
+        for i, side in enumerate(self._mano_sides):
+            hand_color_idx = 1 if side == "right" else 2
+            self._seg_node_map[self._mano_nodes[i]] = HAND_COLORS[hand_color_idx].rgb
+
     def get_rgb_image(self, frame_id, serial):
         return self._loader.get_rgb_image(frame_id, serial)
 
-    def get_rendered_image(self, frame_id, serial):
+    def get_render_colors(self):
+        color_images = {}
+        # Render color images for realsense cameras
+        r = pyrender.OffscreenRenderer(self._rs_width, self._rs_height)
+        for serial in self._rs_serials:
+            self._scene.main_camera_node = self._camera_nodes[serial]
+            color, _ = r.render(self._scene, flags=self._rgb_flags)
+            color_images[serial] = color
+        r.delete()
+        # Render color image for hololens camera
+        r = pyrender.OffscreenRenderer(self._hl_pv_width, self._hl_pv_height)
+        self._scene.main_camera_node = self._camera_nodes[self._hl_serial]
+        color, _ = r.render(self._scene, flags=self._rgb_flags)
+        color_images[self._hl_serial] = color
+        r.delete()
+        return color_images
 
-    def get_rendered_mesh(self, frame_id, serial):
-        obj_nodes = [
-            self._scene.add(
-                mesh,
-                name=f"mesh_{i}",
-                parent_node=self._world_node,
+    def get_render_depths(self):
+        depth_images = {}
+        # Render depth images for realsense cameras
+        r = pyrender.OffscreenRenderer(self._rs_width, self._rs_height)
+        for serial in self._rs_serials:
+            self._scene.main_camera_node = self._camera_nodes[serial]
+            depth = r.render(self._scene, flags=self._depth_flags)
+            depth_images[serial] = depth
+        r.delete()
+        # Render depth image for hololens camera
+        r = pyrender.OffscreenRenderer(self._hl_pv_width, self._hl_pv_height)
+        self._scene.main_camera_node = self._camera_nodes[self._hl_serial]
+        depth = r.render(self._scene, flags=self._depth_flags)
+        depth_images[self._hl_serial] = depth
+        r.delete()
+        return depth_images
+
+    def get_render_masks(self):
+        mask_images = {}
+        # Render mask images for realsense cameras
+        r = pyrender.OffscreenRenderer(self._rs_width, self._rs_height)
+        for serial in self._rs_serials:
+            self._scene.main_camera_node = self._camera_nodes[serial]
+            mask, _ = r.render(
+                self._scene, flags=self._mask_flags, seg_node_map=self._seg_node_map
             )
-            for i, mesh in enumerate(self._obj_meshes)
-        ]
-        # set object pose
-        seg_node_map = {}
-        for i, obj_node in enumerate(obj_nodes):
-            self._scene.set_pose(obj_node, self._poses_o[i, frame_id])
-            seg_node_map[obj_node] = OBJ_CLASS_COLORS[i + 1].rgb
-
-        if serial == self._hl_serial:
-            # set hololens camera pose
-            self._scene.set_pose(
-                node=self._cam_nodes[serial],
-                pose=self._poses_pv[frame_id] @ cvcam_in_glcam,
-            )
-            r = pyrender.OffscreenRenderer(
-                viewport_width=self._hl_pv_width,
-                viewport_height=self._hl_pv_height,
-            )
-
-        else:
-            r = pyrender.OffscreenRenderer(
-                viewport_width=self._rs_width,
-                viewport_height=self._rs_height,
-            )
-
-        # set camera node
-        self._scene.main_camera_node = self._cam_nodes[serial]
-
-        # render rgb, depth, mask
-        color, depth = r.render(self._scene, flags=self._rgb_flags)
+            mask_images[serial] = mask
+        r.delete()
+        # Render mask image for hololens camera
+        r = pyrender.OffscreenRenderer(self._hl_pv_width, self._hl_pv_height)
+        self._scene.main_camera_node = self._camera_nodes[self._hl_serial]
         mask, _ = r.render(
-            self._scene, flags=self._mask_flags, seg_node_map=seg_node_map
+            self._scene, flags=self._mask_flags, seg_node_map=self._seg_node_map
         )
-        # mask = mask[:, :, 0]
-
-        # release source
-        for obj_node in obj_nodes:
-            self._scene.remove_node(obj_node)
+        mask_images[self._hl_serial] = mask
         r.delete()
-
-        return color, depth, mask
-
-    def get_rendered_point_cloud(self, frame_id, serial):
-        self._loader.step_by_frame_id(frame_id)
-        # pcd_masks = self._loader.masks
-        # pcd_points = self._loader.points[pcd_masks].cpu().numpy()
-        # pcd_colors = self._loader.colors[pcd_masks].cpu().numpy()
-        pcd_points = self._loader.points.cpu().numpy().reshape(-1, 3)
-        pcd_colors = self._loader.colors.cpu().numpy().reshape(-1, 3)
-
-        pcd_node = self._scene.add(
-            pyrender.Mesh.from_points(points=pcd_points, colors=pcd_colors),
-            name="pcd",
-            parent_node=self._world_node,
-        )
-
-        if serial == self._hl_serial:
-            # set hololens camera pose
-            self._scene.set_pose(
-                node=self._cam_nodes[serial],
-                pose=self._poses_pv[frame_id] @ cvcam_in_glcam,
-            )
-            r = pyrender.OffscreenRenderer(
-                viewport_width=self._hl_pv_width,
-                viewport_height=self._hl_pv_height,
-                point_size=1.0,
-            )
-
-        else:
-            r = pyrender.OffscreenRenderer(
-                viewport_width=self._rs_width,
-                viewport_height=self._rs_height,
-                point_size=1.0,
-            )
-
-        # set camera node
-        self._scene.main_camera_node = self._cam_nodes[serial]
-
-        color, depth = r.render(self._scene, flags=self._rgb_flags)
-        depth = (depth * 1000.0).astype(np.int16)  # convert to mm
-        mask = np.zeros_like(depth).astype(np.uint8)
-
-        # release source
-        self._scene.remove_node(pcd_node)
-        r.delete()
-
-        return color, depth, mask
-
-    def get_rendered_scene(self, frame_id, serial):
-        obj_nodes = [
-            self._scene.add(
-                mesh,
-                name=f"mesh_{i}",
-                parent_node=self._world_node,
-            )
-            for i, mesh in enumerate(self._obj_meshes)
-        ]
-
-        # set object pose
-        for i, obj_node in enumerate(obj_nodes):
-            self._scene.set_pose(obj_node, self._poses_o[i, frame_id])
-
-        if serial == self._hl_serial:
-            # set hololens camera pose
-            self._scene.set_pose(
-                node=self._cam_nodes[serial],
-                pose=self._poses_pv[frame_id] @ cvcam_in_glcam,
-            )
-            r = pyrender.OffscreenRenderer(
-                viewport_width=self._hl_pv_width,
-                viewport_height=self._hl_pv_height,
-            )
-
-        else:
-            r = pyrender.OffscreenRenderer(
-                viewport_width=self._rs_width,
-                viewport_height=self._rs_height,
-            )
-
-        # set camera node
-        self._scene.main_camera_node = self._cam_nodes[serial]
-
-        # render rgb, depth, mask
-        mask, _ = r.render(
-            self._scene,
-            flags=self._mask_flags,
-            seg_node_map={
-                # obj_node: OBJ_CLASS_COLORS[i + 1].rgb
-                obj_node: [i + 1] * 3
-                for i, obj_node in enumerate(obj_nodes)
-            },
-        )
-        mask = mask[:, :, 0]
-        print(np.unique(mask), mask.shape, mask.dtype, mask.min(), mask.max())
-
-        self._loader.step_by_frame_id(frame_id)
-        # pcd_masks = self._loader.masks
-        # pcd_points = self._loader.points[pcd_masks].cpu().numpy()
-        # pcd_colors = self._loader.colors[pcd_masks].cpu().numpy()
-        pcd_points = self._loader.points.cpu().numpy().reshape(-1, 3)
-        pcd_colors = self._loader.colors.cpu().numpy().reshape(-1, 3)
-        pcd_colors = pcd_colors[pcd_points[:, 2] > 0.0]
-        pcd_points = pcd_points[pcd_points[:, 2] > 0.0]
-
-        pcd_node = self._scene.add(
-            pyrender.Mesh.from_points(points=pcd_points, colors=pcd_colors),
-            name="pcd",
-            parent_node=self._world_node,
-        )
-
-        color, depth = r.render(self._scene, flags=self._rgb_flags)
-
-        # release source
-        # for obj_node in obj_nodes:
-        #     self._scene.remove_node(obj_node)
-        self._scene.remove_node(pcd_node)
-        r.delete()
-
-        return color, depth, mask
-
-    def _create_frame_scene(self, frame_id):
-        scene = pyrender.Scene(bg_color=[0.0, 0.0, 0.0], ambient_light=[1.0, 1.0, 1.0])
-        # Add world node
-        scene.add_node(pyrender.Node(name="world_node"))
-        # Add camera nodes
-        for i, serial in enumerate(self._rs_serials):
-            scene.add(
-                self._cameras[serial],
-                name=serial,
-                parent_name="world_node",
-                pose=self._rs_extrinsics[i] @ cvcam_in_glcam,
-            )
-        scene.add(
-            self._cameras[self._hl_serial],
-            name=self._hl_serial,
-            parent_name="world_node",
-            pose=self._poses_pv[frame_id] @ cvcam_in_glcam,
-        )
-        # Add object nodes
-        for i, obj_id in enumerate(self._object_ids):
-            scene.add(
-                self._obj_meshes[i],
-                name=obj_id,
-                parent_name="world_node",
-                pose=self._poses_o[i, frame_id],
-            )
-
-        return scene
+        return mask_images
 
     @property
     def num_frames(self):
@@ -384,29 +315,29 @@ def plot_and_save_images(images):
     plt.show()
 
 
-def args_parser():
-    parser = argparse.ArgumentParser(description="Sequence Renderer")
-    parser.add_argument(
-        "--sequence_folder",
-        type=str,
-        default="data/subject_1/20231025_165502",
-        help="Sequence path relative to the data folder",
-    )
-    return parser.parse_args()
-
-
 if __name__ == "__main__":
-    # args = args_parser()
-    # sequence_folder = Path(args.sequence_folder).resolve()
-
     sequence_folder = PROJ_ROOT / "data/subject_1/20231025_165502"
     renderer = SequenceRenderer(sequence_folder)
 
-    frame_id = 0
-    scene = renderer._create_frame_scene(frame_id)
+    frame_id = 70
 
-    r = pyrender.OffscreenRenderer(640, 480)
-    hl_renderer = pyrender.OffscreenRenderer(1280, 720)
+    # rs_serials = renderer.rs_serials
+    # hl_serial = renderer.holo_serial
 
-    rs_serials = renderer.rs_serials
-    hl_serial = renderer.holo_serial
+    # for serial in rs_serials:
+    #     rgb = renderer.get_rgb_image(frame_id, serial)
+    #     write_rgb_image(f"color_{serial}.jpg", rgb)
+
+    # rgb = renderer.get_rgb_image(frame_id, hl_serial)
+    # write_rgb_image(f"color_{hl_serial}.jpg", rgb)
+
+    renderer.create_scene(frame_id)
+    # render_colors = renderer.get_render_colors()
+    # render_colors = renderer.get_render_depths()
+    render_colors = renderer.get_render_masks()
+
+    for serial, render_color in render_colors.items():
+        color = renderer.get_rgb_image(frame_id, serial)
+        color = cv2.addWeighted(color, 0.5, render_color, 0.5, 0)
+        # render_color = get_depth_colormap(render_color)
+        write_rgb_image(f"color_{serial}.png", color)
