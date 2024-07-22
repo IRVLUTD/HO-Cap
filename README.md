@@ -20,7 +20,7 @@ Jikai Wang, Qifan Zhang, Yu-Wei Chao, Bowen Wen, Xiaohu Guo, Yu Xiang
   - [Contents](#contents)
   - [News](#news)
   - [BibTeX Citation](#bibtex-citation)
-  - [License](#license)
+    - [License](#license)
   - [Installation](#installation)
   - [Download the HO-Cap Dataset](#download-the-ho-cap-dataset)
   - [Loading Dataset and Visualizing Samples](#loading-dataset-and-visualizing-samples)
@@ -294,12 +294,9 @@ The benchmark evaluation example results are stored under the ./config/benchmark
 
 
 
-
-
 [^1]: [A2J-Transformer: Anchor-to-Joint Transformer Network for 3D Interacting Hand Pose Estimation from a Single RGB Image](https://arxiv.org/abs/2304.03635)
 [^2]: [Reconstructing Hands in 3D with Transformers](https://arxiv.org/abs/2312.05251)
 [^3]: [MegaPose: 6D Pose Estimation of Novel Objects via Render & Compare](https://arxiv.org/abs/2212.06870)
 [^4]: [FoundationPose: Unified 6D Pose Estimation and Tracking of Novel Objects](https://arxiv.org/abs/2312.08344)
 [^5]: [CNOS: A Strong Baseline for CAD-based Novel Object Segmentation](http://arxiv.org/abs/2307.11067)
 [^6]: [Grounding DINO: Marrying DINO with Grounded Pre-Training for Open-Set Object Detection](https://arxiv.org/abs/2303.05499)
-```
