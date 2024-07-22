@@ -155,13 +155,6 @@ class XmemSegmentation:
 
 
 if __name__ == "__main__":
-    # parser = argparse.ArgumentParser(description="XMem segmentation")
-    # parser.add_argument(
-    #     "--sequence_folder", type=str, required=True, help="Path to the sequence folder"
-    # )
-    # args = parser.parse_args()
-    # sequence_folder = Path(args.sequence_folder)
-
     sequence_folder = PROJ_ROOT / "data/subject_1/20231025_165502"
 
     xmem_seg = XmemSegmentation(sequence_folder)

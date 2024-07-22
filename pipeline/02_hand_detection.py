@@ -781,13 +781,8 @@ class HandDetector:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Hand Detection")
-    parser.add_argument(
-        "--sequence_folder", type=str, required=True, help="Path to the sequence folder"
-    )
-    parser.add_argument("--device", type=str, default="cuda", help="Device to run on")
-    args = parser.parse_args()
+    sequence_folder = PROJ_ROOT / "data/subject_1/20231025_165502"
 
-    detector = HandDetector(args.sequence_folder, args.device)
+    detector = HandDetector(sequence_folder, device="cuda")
     detector.run_mp_handmarks_detection()
     detector.run_joints_3d_estimation()

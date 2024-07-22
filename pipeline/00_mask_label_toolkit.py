@@ -51,7 +51,7 @@ class ImageLabelToolkit:
 
     def _init_sam_predictor(self, model_type: str):
         """Initializes the SAM predictor."""
-        chkpt = PROJ_ROOT / f"config/SAM/sam_{model_type}.pth"
+        chkpt = PROJ_ROOT / f"config/sam/sam_{model_type}.pth"
         sam = sam_model_registry[model_type](checkpoint=chkpt)
         sam = sam.to(self._device)
         sam.eval()
@@ -377,27 +377,6 @@ class ImageLabelToolkit:
         else:
             self._curr_mask = np.zeros(self._raw_image.shape[:2], dtype=np.uint8)
 
-    # def _overlay_mask(
-    #     self, image: np.ndarray, mask: np.ndarray, alpha: float = 0.4
-    # ) -> np.ndarray:
-    #     """Overlays the mask on the image."""
-    #     unique_labels = np.unique(mask)
-    #     if len(unique_labels) == 1:
-    #         return image
-    #     unique_labels = unique_labels[unique_labels != 0]  # Removing background
-    #     # Map each object label in the mask to a color
-    #     overlay = np.zeros_like(image)
-    #     for label in unique_labels:
-    #         mask_color = (
-    #             (255, 255, 255)
-    #             if label == 255
-    #             else OBJ_CLASS_COLORS[label % len(OBJ_CLASS_COLORS)].rgb
-    #         )
-    #         overlay[mask == label] = mask_color
-    #     # Blend the color image and the mask
-    #     blended = cv2.addWeighted(image, 1 - alpha, overlay, alpha, 0)
-    #     return blended
-
     def _overlay_mask(
         self, image: np.ndarray, mask: np.ndarray, alpha: float = 0.65
     ) -> np.ndarray:
@@ -446,7 +425,7 @@ class ImageLabelToolkit:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Image Label Toolkit")
-    parser.add_argument("--model_type", type=str, default="vit_l")
+    parser.add_argument("--model_type", type=str, default="vit_t")
     parser.add_argument("--device", type=str, default="cuda")
     parser.add_argument("--debug", action="store_true")
     args = parser.parse_args()
