@@ -10,7 +10,8 @@ Jikai Wang, Qifan Zhang, Yu-Wei Chao, Bowen Wen, Xiaohu Guo, Yu Xiang
 
 [ [arXiv](https://arxiv.org/abs/2406.06843) ] [ [Project page](https://irvlutd.github.io/HOCap/) ]
 
-![hocap-demo-video](./assets/ho-cap-demo-all-cameras.gif)
+<!-- ![hocap-demo-video](./assets/ho-cap-demo-all-cameras.gif) -->
+![hocap-demo-video](https://irvlutd.github.io/HOCap/assets/videos/ho-cap-demo.mp4)
 
 ---
 
@@ -35,7 +36,6 @@ Jikai Wang, Qifan Zhang, Yu-Wei Chao, Bowen Wen, Xiaohu Guo, Yu Xiang
 
 - **2024-06-24**: The HO-Cap dataset is released! Please check the [project page](https://irvlutd.github.io/HOCap/) for more details.
 
-<!-- ![hocap-demo-video](https://irvlutd.github.io/HOCap/assets/videos/ho-cap-demo.mp4) -->
 
 ## BibTeX Citation
 
@@ -279,21 +279,23 @@ The benchmark evaluation example results are stored under `./config/benchmarks` 
 
    <details>
    <summary> You should see the following output: (click to expand) </summary>
+
    ```
-   Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.253
-   Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.279
-   Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.248
-   Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.016
-   Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.276
-   Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.249
-   Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.549
-   Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.549
-   Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.549
-   Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.138
-   Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.562
-   Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.388
+    Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.253
+    Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.279
+    Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.248
+    Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.016
+    Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.276
+    Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.249
+    Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.549
+    Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.549
+    Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.549
+    Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.138
+    Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.562
+    Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.388
    AP: 0.253 | AP_50: 0.279 | AP_75: 0.248 | AP_s: 0.016 | AP_m: 0.276 | AP_l: 0.249
    ```
+
    </details>
 
 
