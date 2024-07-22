@@ -10,8 +10,7 @@ Jikai Wang, Qifan Zhang, Yu-Wei Chao, Bowen Wen, Xiaohu Guo, Yu Xiang
 
 [ [arXiv](https://arxiv.org/abs/2406.06843) ] [ [Project page](https://irvlutd.github.io/HOCap/) ]
 
-<!-- ![hocap-demo-video](./assets/ho-cap-demo-all-cameras.gif) -->
-![hocap-demo-video](https://irvlutd.github.io/HOCap/assets/videos/ho-cap-demo.mp4)
+![hocap-demo-video](./assets/ho-cap-demo-all-cameras.gif)
 
 ---
 
