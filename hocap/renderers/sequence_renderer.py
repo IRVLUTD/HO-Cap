@@ -78,8 +78,8 @@ class SequenceRenderer:
         return poses
 
     def _load_holo_poses(self):
-        pose_file = self._seq_folder / "poses_pv_fd.npy"
-        poses = np.linalg.inv(np.load(pose_file))
+        pose_file = self._seq_folder / "poses_pv.npy"
+        poses = quat_to_mat(np.load(pose_file))
         return poses
 
     def _get_mano_verts(self):
@@ -321,23 +321,12 @@ if __name__ == "__main__":
 
     frame_id = 70
 
-    # rs_serials = renderer.rs_serials
-    # hl_serial = renderer.holo_serial
-
-    # for serial in rs_serials:
-    #     rgb = renderer.get_rgb_image(frame_id, serial)
-    #     write_rgb_image(f"color_{serial}.jpg", rgb)
-
-    # rgb = renderer.get_rgb_image(frame_id, hl_serial)
-    # write_rgb_image(f"color_{hl_serial}.jpg", rgb)
-
     renderer.create_scene(frame_id)
-    # render_colors = renderer.get_render_colors()
-    # render_colors = renderer.get_render_depths()
-    render_colors = renderer.get_render_masks()
+    render_colors = renderer.get_render_colors()
+    render_depths = renderer.get_render_depths()
+    render_masks = renderer.get_render_masks()
 
     for serial, render_color in render_colors.items():
         color = renderer.get_rgb_image(frame_id, serial)
         color = cv2.addWeighted(color, 0.5, render_color, 0.5, 0)
-        # render_color = get_depth_colormap(render_color)
         write_rgb_image(f"color_{serial}.png", color)
