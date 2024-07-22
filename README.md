@@ -1,8 +1,8 @@
 # HO-Cap Toolkit
 
- [![Python](https://img.shields.io/badge/Python-3.10-blue.svg)](https://www.python.org/downloads/release/python-3100) [![ROS](https://img.shields.io/badge/ROS-Melodic-green.svg)](http://wiki.ros.org/melodic) [![Pytorch](https://img.shields.io/badge/Pytorch-2.1.1-orange.svg)](https://pytorch.org/) ![License](https://img.shields.io/badge/License-MIT-green.svg)
+[![Python](https://img.shields.io/badge/Python-3.10-blue.svg)](https://www.python.org/downloads/release/python-3100) [![ROS](https://img.shields.io/badge/ROS-Melodic-green.svg)](http://wiki.ros.org/melodic) [![Pytorch](https://img.shields.io/badge/Pytorch-2.1.1-orange.svg)](https://pytorch.org/) ![License](https://img.shields.io/badge/License-MIT-green.svg)
 
-The HO-Cap Toolkit is a Python package that provides evaluation and visualization tools for the HOCap dataset.
+The HO-Cap Toolkit is a Python package that provides evaluation and visualization tools for the HO-Cap dataset.
 
 **HO-Cap: A Capture System and Dataset for 3D Reconstruction and Pose Tracking of Hand-Object Interaction**
 
@@ -14,14 +14,13 @@ Jikai Wang, Qifan Zhang, Yu-Wei Chao, Bowen Wen, Xiaohu Guo, Yu Xiang
 
 ---
 
-
 ## Contents
 
 - [HO-Cap Toolkit](#ho-cap-toolkit)
   - [Contents](#contents)
   - [News](#news)
   - [BibTeX Citation](#bibtex-citation)
-    - [License](#license)
+  - [License](#license)
   - [Installation](#installation)
   - [Download the HO-Cap Dataset](#download-the-ho-cap-dataset)
   - [Loading Dataset and Visualizing Samples](#loading-dataset-and-visualizing-samples)
@@ -30,15 +29,13 @@ Jikai Wang, Qifan Zhang, Yu-Wei Chao, Bowen Wen, Xiaohu Guo, Yu Xiang
     - [Novel Object Pose Estimation Evaluation](#novel-object-pose-estimation-evaluation)
     - [Novel Object Detection Evaluation](#novel-object-detection-evaluation)
 
-
 ## News
 
 - **2024-06-24**: The HO-Cap dataset is released! Please check the [project page](https://irvlutd.github.io/HOCap/) for more details.
 
-
 ## BibTeX Citation
 
-If HO-Cap helps your research, please consider citing the following citations:
+If HO-Cap helps your research, please consider citing the following:
 
 ```
 @misc{wang2024hocap,
@@ -51,15 +48,15 @@ If HO-Cap helps your research, please consider citing the following citations:
 }
 ```
 
+
 ### License
 
 HOCap Toolkit is released under the [GNU General Public License v3.0](LICENSE).
 
 
-
 ## Installation
 
-This code is tested with [Python 3.10](https://docs.python.org/3.10) and CUDA 11.8 on Ubuntu 20.04. Make sure CUDA 11.8 is installed on your system before running the code.
+This code is tested with [Python 3.10](https://docs.python.org/3.10) and CUDA 11.8 on Ubuntu 20.04. **Make sure CUDA 11.8 is installed on your system before running the code.**
 
 1. Clone the HO-Cap repository from GitHub.
 
@@ -161,30 +158,26 @@ This code is tested with [Python 3.10](https://docs.python.org/3.10) and CUDA 11
 
 ## Evaluation
 
-
 HO-Cap provides the benchmark evaluation for three tasks:
+
 - **Hand Pose Estimation** (A2J-Transformer[^1] and HaMeR[^2])
 - **Novel Object Pose Estimation** (MegaPose[^3] and FoundationPose[^4])
 - **Novel Object Detection** (CNOS[^5] and GroundingDINO[^6]).
 
-The benchmark evaluation example results are stored under `./config/benchmarks` directory. If the evaluation results are saved in the same format, below evaluation codes could be used to evaluate the results.
+The benchmark evaluation example results are stored under the ./config/benchmarks directory. If the evaluation results are saved in the same format, the evaluation codes below can be used to evaluate the results.
 
 ### Hand Pose Estimation Evaluation
 
-- Evaluate the hand pose estimation performance using A2J-Transformer and HaMeR:
+- Evaluate the hand pose estimation performance:
    
    ```bash
    python examples/evaluate_hand_pose.py
    ```
 
    <details>
-
    <summary> You should see the following output: </summary>
-
    ```
-   Evaluation results for A2J-Transformer:
-
-   Evaluation results for HaMeR:
+   Evaluation results:
    ```
    </details>
 
@@ -198,9 +191,7 @@ The benchmark evaluation example results are stored under `./config/benchmarks` 
    ```
 
    <details>
-
    <summary> You should see the following output: </summary>
-
    ```
    Object_ID  ADD-S_err (cm)  ADD_err (cm)  ADD-S_AUC (%)  ADD_AUC (%)
        G01_1        0.622285      0.931847      95.251779    93.088153
@@ -270,7 +261,7 @@ The benchmark evaluation example results are stored under `./config/benchmarks` 
 
 ### Novel Object Detection Evaluation
 
-- Evaluate the novel object detection performance using CNOS and GroundingDINO:
+- Evaluate the novel object detection performance:
    
    ```bash
    python examples/evaluate_novel_object_detection.py
@@ -278,7 +269,6 @@ The benchmark evaluation example results are stored under `./config/benchmarks` 
 
    <details>
    <summary> You should see the following output: (click to expand) </summary>
-
    ```
     Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.253
     Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.279
@@ -294,7 +284,6 @@ The benchmark evaluation example results are stored under `./config/benchmarks` 
     Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.388
    AP: 0.253 | AP_50: 0.279 | AP_75: 0.248 | AP_s: 0.016 | AP_m: 0.276 | AP_l: 0.249
    ```
-
    </details>
 
 
