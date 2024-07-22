@@ -10,7 +10,10 @@ Jikai Wang, Qifan Zhang, Yu-Wei Chao, Bowen Wen, Xiaohu Guo, Yu Xiang
 
 [ [arXiv](https://arxiv.org/abs/2406.06843) ] [ [Project page](https://irvlutd.github.io/HOCap/) ]
 
+![hocap-demo-video](./assets/ho-cap-demo-all-cameras.gif)
+
 ---
+
 
 ## Contents
 
@@ -33,7 +36,6 @@ Jikai Wang, Qifan Zhang, Yu-Wei Chao, Bowen Wen, Xiaohu Guo, Yu Xiang
 - **2024-06-24**: The HO-Cap dataset is released! Please check the [project page](https://irvlutd.github.io/HOCap/) for more details.
 
 <!-- ![hocap-demo-video](https://irvlutd.github.io/HOCap/assets/videos/ho-cap-demo.mp4) -->
-![hocap-demo-video](./assets/ho-cap-demo-all-cameras.gif)
 
 ## BibTeX Citation
 
@@ -166,7 +168,7 @@ HO-Cap provides the benchmark evaluation for three tasks:
 - **Novel Object Pose Estimation** (MegaPose[^3] and FoundationPose[^4])
 - **Novel Object Detection** (CNOS[^5] and GroundingDINO[^6]).
 
-The benchmark evaluation example results are stored under `./config/benchmarks` directory.
+The benchmark evaluation example results are stored under `./config/benchmarks` directory. If the evaluation results are saved in the same format, below evaluation codes could be used to evaluate the results.
 
 ### Hand Pose Estimation Evaluation
 
