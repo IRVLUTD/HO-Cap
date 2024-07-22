@@ -1,6 +1,8 @@
-# HOCap Toolkit
+# HO-Cap Toolkit
 
-HOCap Toolkit is a Python package that provides evaluation and visualization tools for the HOCap dataset.
+ [![Python](https://img.shields.io/badge/Python-3.10-blue.svg)](https://www.python.org/downloads/release/python-3100) [![ROS](https://img.shields.io/badge/ROS-Melodic-green.svg)](http://wiki.ros.org/melodic) [![Pytorch](https://img.shields.io/badge/Pytorch-2.1.1-orange.svg)](https://pytorch.org/) ![License](https://img.shields.io/badge/License-MIT-green.svg)
+
+The HO-Cap Toolkit is a Python package that provides evaluation and visualization tools for the HOCap dataset.
 
 **HO-Cap: A Capture System and Dataset for 3D Reconstruction and Pose Tracking of Hand-Object Interaction**
 
@@ -12,7 +14,7 @@ Jikai Wang, Qifan Zhang, Yu-Wei Chao, Bowen Wen, Xiaohu Guo, Yu Xiang
 
 ## Contents
 
-- [HOCap Toolkit](#hocap-toolkit)
+- [HO-Cap Toolkit](#ho-cap-toolkit)
   - [Contents](#contents)
   - [News](#news)
   - [BibTeX Citation](#bibtex-citation)
@@ -199,9 +201,68 @@ The benchmark evaluation example results are stored under `./config/benchmarks` 
    <summary> You should see the following output: </summary>
 
    ```
-   Evaluation results for MegaPose:
-
-   Evaluation results for FoundationPose:
+   Object_ID  ADD-S_err (cm)  ADD_err (cm)  ADD-S_AUC (%)  ADD_AUC (%)
+       G01_1        0.622285      0.931847      95.251779    93.088153
+       G01_2        1.722639      2.864552      88.236088    82.951038
+       G01_3        3.603058      5.267925      80.363333    74.809918
+       G01_4        3.319628      5.182604      81.892213    73.259688
+       G02_1        2.876358      4.932917      83.108740    71.551933
+       G02_2        2.311827      4.164094      85.415819    73.653125
+       G02_3        2.053942      4.038427      86.666730    73.781861
+       G02_4        2.156008      4.216609      85.868099    72.308455
+       G04_1        2.291773      4.423770      84.896350    70.877876
+       G04_2        2.277173      4.526859      84.796541    69.969442
+       G04_3        2.262719      4.480607      84.811976    70.126703
+       G04_4        2.187466      4.335308      85.241063    71.009475
+       G05_1        2.202152      4.406457      85.158656    70.094175
+       G05_2        2.150769      4.311178      85.284022    70.394463
+       G05_3        2.101135      4.209764      85.459741    70.812713
+       G05_4        2.049368      4.321723      85.748722    69.201963
+       G07_1        2.239657      4.499831      84.288352    68.425880
+       G07_2        2.283744      4.585382      84.192769    68.369226
+       G07_3        2.289358      4.521216      84.392293    69.088029
+       G07_4        2.453944      4.659746      83.901788    69.095688
+       G09_1        2.335954      4.383290      84.421006    70.399909
+       G09_2        2.207153      4.117222      84.960095    71.813927
+       G09_3        2.335119      4.363489      84.739485    70.545486
+       G09_4        2.314741      4.390959      84.742636    69.967545
+       G10_1        2.287382      4.345581      84.872734    70.169253
+       G10_2        2.292289      4.354261      84.920001    70.067050
+       G10_3        2.286696      4.332340      84.864717    70.138265
+       G10_4        2.350560      4.466639      84.312511    69.109810
+       G11_1        2.478856      4.630755      83.580471    68.318521
+       G11_2        2.517070      4.716128      83.381718    67.764666
+       G11_3        2.497892      4.752518      83.509188    67.267398
+       G11_4        2.608370      4.907855      82.847013    66.485662
+       G15_1        2.607319      4.912701      82.787732    66.344681
+       G15_2        2.604308      4.916133      82.790136    66.274095
+       G15_3        2.603031      4.916675      82.782173    66.238405
+       G15_4        2.629115      4.932682      82.644975    66.187657
+       G16_1        2.606751      4.876389      82.686423    66.579694
+       G16_2        2.583274      4.851990      82.732962    66.555754
+       G16_3        2.636666      4.903458      82.405020    66.285514
+       G16_4        2.613952      4.858562      82.467323    66.479288
+       G18_1        2.623657      4.922163      82.487034    66.229327
+       G18_2        2.623725      4.909405      82.459508    66.320043
+       G18_3        2.605120      4.869260      82.583889    66.595389
+       G18_4        2.582878      4.822793      82.745806    66.909936
+       G19_1        2.579643      4.815924      82.741131    66.929992
+       G19_2        2.594446      4.834087      82.630870    66.835297
+       G19_3        2.589485      4.847906      82.652686    66.650070
+       G19_4        2.598538      4.853894      82.662542    66.699528
+       G20_1        2.590124      4.950461      82.710792    65.838859
+       G20_2        2.572236      4.932026      82.833246    65.916376
+       G20_3        2.542719      4.877217      83.028086    66.275407
+       G20_4        2.576188      4.990698      82.730561    65.337352
+       G21_1        2.563550      4.973498      82.796708    65.404425
+       G21_2        2.556220      4.961612      82.823936    65.445065
+       G21_3        2.588855      4.998793      82.592185    65.252844
+       G21_4        2.608319      5.020533      82.438422    65.145589
+       G22_1        2.584527      4.989324      82.588827    65.342481
+       G22_2        2.635756      5.087002      82.387761    64.790779
+       G22_3        2.643167      5.106887      82.358116    64.694632
+       G22_4        2.680397      5.162142      82.094643    64.501227
+     Average        2.680397      5.162142      83.829502    68.882950
    ```
    </details>
 
@@ -215,13 +276,21 @@ The benchmark evaluation example results are stored under `./config/benchmarks` 
    ```
 
    <details>
-
    <summary> You should see the following output: (click to expand) </summary>
-
    ```
-   Evaluation results for CNOS:
-
-   Evaluation results for GroundingDINO:
+   Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.253
+   Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.279
+   Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.248
+   Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.016
+   Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.276
+   Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.249
+   Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.549
+   Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.549
+   Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.549
+   Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.138
+   Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.562
+   Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.388
+   AP: 0.253 | AP_50: 0.279 | AP_75: 0.248 | AP_s: 0.016 | AP_m: 0.276 | AP_l: 0.249
    ```
    </details>
 

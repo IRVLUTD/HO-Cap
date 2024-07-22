@@ -1,11 +1,6 @@
-import numpy as np
-import trimesh
 import pandas as pd
-from tqdm import tqdm
 from scipy.spatial import cKDTree
-from _init_paths import *
-from lib.utils import *
-from lib.utils.common import *
+from hocap.utils import *
 
 
 def to_homo(pts):
@@ -185,14 +180,14 @@ if __name__ == "__main__":
         / "data/benchmarks/object_pose/MegaPose_results-megapose-1.0-RGBD_stable_small.json"
     )
 
-    tqdm.write("- Evaluating FoundationPose results all...")
-    get_object_pose_evaluation(gt_pose_file_all, fd_pose_file_all)
+    # tqdm.write("- Evaluating FoundationPose results all...")
+    # get_object_pose_evaluation(gt_pose_file_all, fd_pose_file_all)
 
-    tqdm.write("- Evaluating MegaPose results all...")
-    get_object_pose_evaluation(gt_pose_file_all, mega_pose_file_all)
+    # tqdm.write("- Evaluating MegaPose results all...")
+    # get_object_pose_evaluation(gt_pose_file_all, mega_pose_file_all)
 
-    tqdm.write("- Evaluating FoundationPose results small...")
-    get_object_pose_evaluation(gt_pose_file_small, fd_pose_file_small)
+    # tqdm.write("- Evaluating FoundationPose results small...")
+    # get_object_pose_evaluation(gt_pose_file_small, fd_pose_file_small)
 
     tqdm.write("- Evaluating MegaPose results small...")
     get_object_pose_evaluation(gt_pose_file_small, mega_pose_file_small)
