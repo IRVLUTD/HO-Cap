@@ -150,93 +150,10 @@ This code is tested with [Python 3.10](https://docs.python.org/3.10) and CUDA 11
    python examples/sequence_renderer.py
    ```
 
+   This will render the color image and segmentation map for all the frames in the sequence. The rendered images will be saved in the `<sequence_folder>/renders/` directory.
+
    ![sequence_renderer_color](./assets/sequence_renderer_color.png)
    ![sequence_renderer_mask](./assets/sequence_renderer_mask.png)
-
-4. You can list all the sequence folders (70 in total) with:
-   ```
-   ls -d data/subject_*/2023* | sort
-   ```
-
-   <details>
-
-   <summary> You should see the following output: (click to expand)</summary>
-
-   ```
-   data/subject_1/20231025_165502
-   data/subject_1/20231025_165807
-   data/subject_1/20231025_170105
-   data/subject_1/20231025_170231
-   data/subject_1/20231025_170532
-   data/subject_1/20231025_170650
-   data/subject_1/20231025_170959
-   data/subject_1/20231025_171117
-   data/subject_1/20231025_171314
-   data/subject_1/20231025_171417
-   data/subject_2/20231022_200657
-   data/subject_2/20231022_201316
-   data/subject_2/20231022_201449
-   data/subject_2/20231022_201556
-   data/subject_2/20231022_201942
-   data/subject_2/20231022_202115
-   data/subject_2/20231022_202617
-   data/subject_2/20231022_203100
-   data/subject_2/20231023_163929
-   data/subject_2/20231023_164242
-   data/subject_2/20231023_164741
-   data/subject_2/20231023_170018
-   data/subject_3/20231024_154531
-   data/subject_3/20231024_154810
-   data/subject_3/20231024_155008
-   data/subject_3/20231024_161209
-   data/subject_3/20231024_161306
-   data/subject_3/20231024_161937
-   data/subject_3/20231024_162028
-   data/subject_3/20231024_162327
-   data/subject_3/20231024_162409
-   data/subject_3/20231024_162756
-   data/subject_3/20231024_162842
-   data/subject_4/20231026_162155
-   data/subject_4/20231026_162248
-   data/subject_4/20231026_163223
-   data/subject_4/20231026_164131
-   data/subject_4/20231026_164812
-   data/subject_4/20231026_164909
-   data/subject_4/20231026_164958
-   data/subject_5/20231027_112303
-   data/subject_5/20231027_113202
-   data/subject_5/20231027_113535
-   data/subject_6/20231025_110646
-   data/subject_6/20231025_110808
-   data/subject_6/20231025_111118
-   data/subject_6/20231025_111357
-   data/subject_6/20231025_112229
-   data/subject_6/20231025_112332
-   data/subject_6/20231025_112546
-   data/subject_7/20231022_190534
-   data/subject_7/20231022_192832
-   data/subject_7/20231022_193506
-   data/subject_7/20231022_193630
-   data/subject_7/20231022_193809
-   data/subject_7/20231023_162803
-   data/subject_7/20231023_163653
-   data/subject_8/20231024_180111
-   data/subject_8/20231024_180651
-   data/subject_8/20231024_180733
-   data/subject_8/20231024_181413
-   data/subject_9/20231027_123403
-   data/subject_9/20231027_123725
-   data/subject_9/20231027_123814
-   data/subject_9/20231027_124057
-   data/subject_9/20231027_124926
-   data/subject_9/20231027_125019
-   data/subject_9/20231027_125315
-   data/subject_9/20231027_125407
-   data/subject_9/20231027_125457
-   ```
-
-   </details>
-
 
 
 ## Evaluation
