@@ -8,6 +8,9 @@ __pycache__/
 # C extensions
 *.so
 
+# Distribution / packaging
+*.egg-info/
+
 # IDEs and editors
 .idea
 .eclipse
@@ -29,7 +32,5 @@ venv.bak/
 .ipynb_checkpoints
 
 # Others
-config/settings.json
 .*_history
-/metadisk
 build.log
