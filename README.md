@@ -176,9 +176,11 @@ The benchmark evaluation example results are stored under the ./config/benchmark
 
    <details>
    <summary> You should see the following output: </summary>
+     
    ```
    Evaluation results:
    ```
+   
    </details>
 
 
@@ -192,6 +194,7 @@ The benchmark evaluation example results are stored under the ./config/benchmark
 
    <details>
    <summary> You should see the following output: </summary>
+     
    ```
    Object_ID  ADD-S_err (cm)  ADD_err (cm)  ADD-S_AUC (%)  ADD_AUC (%)
        G01_1        0.622285      0.931847      95.251779    93.088153
@@ -256,6 +259,7 @@ The benchmark evaluation example results are stored under the ./config/benchmark
        G22_4        2.680397      5.162142      82.094643    64.501227
      Average        2.680397      5.162142      83.829502    68.882950
    ```
+   
    </details>
 
 
@@ -269,6 +273,7 @@ The benchmark evaluation example results are stored under the ./config/benchmark
 
    <details>
    <summary> You should see the following output: (click to expand) </summary>
+     
    ```
     Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.253
     Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.279
@@ -284,6 +289,7 @@ The benchmark evaluation example results are stored under the ./config/benchmark
     Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.388
    AP: 0.253 | AP_50: 0.279 | AP_75: 0.248 | AP_s: 0.016 | AP_m: 0.276 | AP_l: 0.249
    ```
+   
    </details>
 
 
