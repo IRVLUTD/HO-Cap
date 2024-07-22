@@ -24,13 +24,17 @@ def evaluate_cnos_detection_results(gt_file, dt_file):
 
 
 if __name__ == "__main__":
-    gt_file = (
-        PROJ_ROOT / "data/benchmarks/object_detection/gt_object_detection_results.json"
-    )
-    dt_file = PROJ_ROOT / "data/benchmarks/object_detection/cnos_coco_detections.json"
+    benchmark_dir = PROJ_ROOT / "data/benchmarks"
+
+    gt_file = PROJ_ROOT / "config/benchmarks/gt_object_detection_results.json"
+    dt_file = PROJ_ROOT / "config/benchmarks/demo_object_detections_results.json"
+
+    tqdm.write("- Evaluating Object Detection results...")
 
     ap_metrics = evaluate_cnos_detection_results(gt_file, dt_file)
 
     print(
         f"AP: {ap_metrics['AP']:.3f} | AP_50: {ap_metrics['AP50']:.3f} | AP_75: {ap_metrics['AP75']:.3f} | AP_s: {ap_metrics['APs']:.3f} | AP_m: {ap_metrics['APm']:.3f} | AP_l: {ap_metrics['APl']:.3f}"
     )
+
+    tqdm.write("- Evaluation Done...")

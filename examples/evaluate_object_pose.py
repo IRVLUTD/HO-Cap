@@ -139,9 +139,6 @@ def get_object_pose_evaluation(gt_pose_file, pred_pose_file):
     pd_data["ADD_AUC (%)"].append(np.mean(pd_data["ADD_AUC (%)"]))
 
     df = pd.DataFrame(pd_data)
-    # save to html
-    save_html_file = pred_pose_file.parent / f"{pred_pose_file.stem}_ADD_ADDS.html"
-    df.to_html(save_html_file, index=False)
 
     # save to txt
     result_str = df.to_string(index=False)
@@ -150,46 +147,15 @@ def get_object_pose_evaluation(gt_pose_file, pred_pose_file):
 
     print(result_str)
 
-    tqdm.write(f"  * Results saved to {save_html_file}")
+    tqdm.write(f"  * Results saved to {save_txt_file}")
 
 
 if __name__ == "__main__":
-    gt_pose_file_all = (
-        PROJ_ROOT
-        / "data/benchmarks/object_pose/object_pose_benchmark_gt_stable_all.json"
-    )
-    fd_pose_file_all = (
-        PROJ_ROOT
-        / "data/benchmarks/object_pose/FoundationPose_results_converted_stable_all.json"
-    )
-    mega_pose_file_all = (
-        PROJ_ROOT
-        / "data/benchmarks/object_pose/MegaPose_results-megapose-1.0-RGBD_stable_all.json"
-    )
+    gt_pose_file = PROJ_ROOT / "config/benchmarks/gt_object_pose_results.json"
+    dt_pose_file = PROJ_ROOT / "config/benchmarks/demo_object_pose_results.json"
 
-    gt_pose_file_small = (
-        PROJ_ROOT
-        / "data/benchmarks/object_pose/object_pose_benchmark_gt_stable_small.json"
-    )
-    fd_pose_file_small = (
-        PROJ_ROOT
-        / "data/benchmarks/object_pose/FoundationPose_results_converted_stable_small.json"
-    )
-    mega_pose_file_small = (
-        PROJ_ROOT
-        / "data/benchmarks/object_pose/MegaPose_results-megapose-1.0-RGBD_stable_small.json"
-    )
+    tqdm.write("- Evaluating Object Pose Estimation results...")
 
-    # tqdm.write("- Evaluating FoundationPose results all...")
-    # get_object_pose_evaluation(gt_pose_file_all, fd_pose_file_all)
+    get_object_pose_evaluation(gt_pose_file, dt_pose_file)
 
-    # tqdm.write("- Evaluating MegaPose results all...")
-    # get_object_pose_evaluation(gt_pose_file_all, mega_pose_file_all)
-
-    # tqdm.write("- Evaluating FoundationPose results small...")
-    # get_object_pose_evaluation(gt_pose_file_small, fd_pose_file_small)
-
-    tqdm.write("- Evaluating MegaPose results small...")
-    get_object_pose_evaluation(gt_pose_file_small, mega_pose_file_small)
-
-    tqdm.write("Evaluation Done...")
+    tqdm.write("- Evaluation Done...")
