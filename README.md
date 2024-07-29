@@ -1,6 +1,6 @@
 # HO-Cap Toolkit
 
-[![Python](https://img.shields.io/badge/Python-3.10-blue.svg)](https://www.python.org/downloads/release/python-3100) [![ROS](https://img.shields.io/badge/ROS-Melodic-green.svg)](http://wiki.ros.org/melodic) [![Pytorch](https://img.shields.io/badge/Pytorch-2.1.1-orange.svg)](https://pytorch.org/) ![License](https://img.shields.io/badge/License-MIT-green.svg)
+[![Python](https://img.shields.io/badge/Python-3.10-blue.svg)](https://www.python.org/downloads/release/python-3100) [![ROS](https://img.shields.io/badge/ROS-Melodic-green.svg)](http://wiki.ros.org/melodic) [![Pytorch](https://img.shields.io/badge/Pytorch-2.1.1-orange.svg)](https://pytorch.org/) ![License](https://img.shields.io/badge/License-GPL--3.0-green.svg)
 
 The HO-Cap Toolkit is a Python package that provides evaluation and visualization tools for the HO-Cap dataset.
 
@@ -51,7 +51,7 @@ If HO-Cap helps your research, please consider citing the following:
 
 ### License
 
-HOCap Toolkit is released under the [GNU General Public License v3.0](LICENSE).
+HOCap Toolkit is released under the [GNU General Public License v3.0](./LICENSE).
 
 
 ## Installation
