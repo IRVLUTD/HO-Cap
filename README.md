@@ -112,8 +112,19 @@ This code is tested with [Python 3.10](https://docs.python.org/3.10) and CUDA 11
 
 ## Download the HO-Cap Dataset
 
-1. Download the HO-Cap dataset from [box](https://utdallas.box.com/v/ho-cap-release).
-2. Extract the dataset to the `./data` directory. And the directory should look like this:
+1. Run below code to download the whole dataset:
+
+   ```
+   python dataset_downloader.py --subject_id all
+   ```
+
+2. Or you can download the dataset for a specific subject:
+
+   ```
+   python dataset_downloader.py --subject_id 1
+   ```
+
+3. The downloaded `.zip` files will be extracted to the `./data` directory. And the directory should look like this:
    
    ```
    ./data
