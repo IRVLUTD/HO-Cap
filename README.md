@@ -155,6 +155,8 @@ This code is tested with [Python 3.10](https://docs.python.org/3.10) and CUDA 11
    python examples/sequence_3d_viewer.py
    ```
 
+   ![sequence_3d_viewer](./assets/sequence_3d_viewer.gif)
+
 3. Below example shows how to offline render the sequence:
    
    ```bash

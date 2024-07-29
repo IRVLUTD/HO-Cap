@@ -310,7 +310,7 @@ class SequenceLoader:
         self._colors.copy_(colors)
         self._masks.copy_(masks)
 
-    def _read_mask_image(self, mask_file, erode_kernel=0, idx=None) -> np.ndarray:
+    def _read_mask_image(self, mask_file, erode_kernel=0) -> np.ndarray:
         """Read mask image from file."""
         if mask_file.exists():
             mask = cv2.imread(str(mask_file), cv2.IMREAD_GRAYSCALE)
@@ -318,7 +318,7 @@ class SequenceLoader:
                 mask = erode_mask(mask, erode_kernel)
         else:
             mask = np.zeros((self._rs_height, self._rs_width), dtype=np.uint8)
-        return mask if idx is None else (mask, idx)
+        return mask
 
     def get_rgb_image(self, frame_id: int, serial: str = None) -> np.ndarray:
         """Get RGB image in numpy format, dtype=uint8, [H, W, 3]."""
@@ -344,18 +344,16 @@ class SequenceLoader:
         """Get depth image in numpy format, dtype=uint16, [H, W]."""
         if serial is None:
             data = [None] * self._num_cams
-            with ThreadPoolExecutor() as executor:
-                workers = [
+            with concurrent.futures.ThreadPoolExecutor() as executor:
+                futures = {
                     executor.submit(
                         read_depth_image,
                         self._data_folder / s / f"depth_{frame_id:06d}.png",
-                        idx=i,
-                    )
+                    ): i
                     for i, s in enumerate(self._rs_serials)
-                ]
-                for worker in workers:
-                    img, idx = worker.result()
-                    data[idx] = img
+                }
+                for future in concurrent.futures.as_completed(futures):
+                    data[futures[future]] = future.result()
         else:
             data = read_depth_image(
                 self._data_folder / serial / f"depth_{frame_id:06d}.png"
@@ -368,25 +366,22 @@ class SequenceLoader:
         """Get mask image in numpy format, dtype=uint8, [H, W]."""
         if serial is None:
             data = [None for _ in self._rs_serials]
-            workers = []
-            with ThreadPoolExecutor() as executor:
-                for i, s in enumerate(self._rs_serials):
-                    workers.append(
-                        executor.submit(
-                            self._read_mask_image,
-                            self._data_folder / s / f"mask_{frame_id:06d}.png",
-                            erode_kernel,
-                            idx=i,
-                        )
-                    )
-                for worker in workers:
-                    img, idx = worker.result()
-                    data[idx] = erode_mask(img, erode_kernel)
+            with concurrent.futures.ThreadPoolExecutor() as executor:
+                futures = {
+                    executor.submit(
+                        self._read_mask_image,
+                        self._data_folder / s / f"mask_{frame_id:06d}.png",
+                        erode_kernel,
+                    ): i
+                    for i, s in enumerate(self._rs_serials)
+                }
+
+                for future in concurrent.futures.as_completed(futures):
+                    data[futures[future]] = future.result()
         else:
             data = self._read_mask_image(
                 self._data_folder / serial / f"mask_{frame_id:06d}.png", erode_kernel
             )
-
         return data
 
     def object_group_layer_forward(
@@ -410,30 +405,6 @@ class SequenceLoader:
             v = v.squeeze(0)
             j = j.squeeze(0)
         return v, j
-
-    def load_object_seg_masks(self) -> np.ndarray:
-        """Load object segmentation masks.
-
-        Returns:
-            np.ndarray: List of segmentation masks, NUM_FRAMES * [NUM_CAMS, H, W], dtype=uint8.
-        """
-        seg_masks = [None for _ in range(self.num_cameras)] * self.num_frames
-        workers = []
-        with ThreadPoolExecutor() as executor:
-            for f_idx in range(self.num_frames):
-                for c_idx, serial in enumerate(self._rs_serials):
-                    workers.append(
-                        executor.submit(
-                            self._read_mask_image,
-                            self._data_folder / serial / f"mask_{f_idx:06d}.png",
-                            idx=(f_idx, c_idx),
-                        )
-                    )
-            for worker in workers:
-                msk, (f_idx, c_idx) = worker.result()
-                seg_masks[f_idx][c_idx] = msk
-        seg_masks = np.stack(seg_masks, axis=0)
-        return seg_masks
 
     def step(self):
         """Step to the next frame."""
@@ -639,4 +610,8 @@ class SequenceLoader:
 
     def load_object_poses(self):
         poses = np.load(self._data_folder / "poses_o.npy")
+        return poses
+
+    def load_mano_poses(self):
+        poses = np.load(self._data_folder / "poses_m.npy")
         return poses
