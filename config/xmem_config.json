@@ -1,0 +1,14 @@
+{
+    "top_k": 30,
+    "mem_every": 3,
+    "deep_update_every": -1,
+    "single_object": false,
+    "enable_long_term": true,
+    "enable_long_term_count_usage": true,
+    "max_mid_term_frames": 60,
+    "min_mid_term_frames": 3,
+    "num_prototypes": 128,
+    "max_long_term_elements": 10000,
+    "device": "cuda",
+    "xmem_model_path": "config/xmem/XMem.pth"
+}
