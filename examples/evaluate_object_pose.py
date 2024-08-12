@@ -140,13 +140,12 @@ def get_object_pose_evaluation(gt_pose_file, pred_pose_file):
 
     df = pd.DataFrame(pd_data)
 
-    # save to txt
     result_str = df.to_string(index=False)
-    save_txt_file = pred_pose_file.parent / f"{pred_pose_file.stem}_ADD_ADDS.txt"
-    save_txt_file.write_text(result_str)
-
     print(result_str)
 
+    # save to txt
+    save_txt_file = pred_pose_file.parent / f"{pred_pose_file.stem}_ADD_ADDS.txt"
+    save_txt_file.write_text(result_str)
     tqdm.write(f"  * Results saved to {save_txt_file}")
 
 
