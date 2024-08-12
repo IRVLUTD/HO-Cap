@@ -2,3 +2,4 @@
 *.ckpt
 *.pth
 *.pkl
+benchmarks/*[.json, .txt]

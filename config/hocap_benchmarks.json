@@ -1,0 +1,8 @@
+{
+    "demo_hand_pose_results.json": "https://utdallas.box.com/shared/static/efxgasbken4pnv7gko8ml98xwnrerzfb.json",
+    "demo_object_detections_results.json": "https://utdallas.box.com/shared/static/4bdeknsvlj78szejhr9mf70flm7jyzmi.json",
+    "demo_object_pose_results.json": "https://utdallas.box.com/shared/static/h6qqszib84kule8wuhsjlqgnrw4zq0ky.json",
+    "gt_hand_pose_results.json" : "https://utdallas.box.com/shared/static/eie0xbnrp7qafvw1f0x2r6b29v1bec3c.json",
+    "gt_object_detections_results.json": "https://utdallas.box.com/shared/static/xxhryajjan2toishmuwyhazv7hzp47z2.json",
+    "gt_object_pose_results.json": "https://utdallas.box.com/shared/static/mx031koahs25q622hff4v0wa41d92205.json"
+}

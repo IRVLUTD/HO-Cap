@@ -1,9 +1,10 @@
+import pandas as pd
 from pycocotools.coco import COCO
 from pycocotools.cocoeval import COCOeval
 from hocap.utils import *
 
 
-def evaluate_cnos_detection_results(gt_file, dt_file):
+def evaluate_object_detection_results(gt_file, dt_file):
     coco_gt = COCO(str(gt_file))
     coco_dt = coco_gt.loadRes(str(dt_file))
     coco_eval = COCOeval(coco_gt, coco_dt, "bbox")
@@ -20,6 +21,15 @@ def evaluate_cnos_detection_results(gt_file, dt_file):
         "APl": coco_eval.stats[5],
     }
 
+    df = pd.DataFrame(ap_metrics)
+    result_str = df.to_string(index=False)
+
+    tqdm.write(result_str)
+
+    # save to txt
+    save_txt_file = dt_file.parent / f"{dt_file.stem}_AP.txt"
+    save_txt_file.write_text(result_str)
+
     return ap_metrics
 
 
@@ -31,7 +41,7 @@ if __name__ == "__main__":
 
     tqdm.write("- Evaluating Object Detection results...")
 
-    ap_metrics = evaluate_cnos_detection_results(gt_file, dt_file)
+    ap_metrics = evaluate_object_detection_results(gt_file, dt_file)
 
     print(
         f"AP: {ap_metrics['AP']:.3f} | AP_50: {ap_metrics['AP50']:.3f} | AP_75: {ap_metrics['AP75']:.3f} | AP_s: {ap_metrics['APs']:.3f} | AP_m: {ap_metrics['APm']:.3f} | AP_l: {ap_metrics['APl']:.3f}"

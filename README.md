@@ -177,7 +177,13 @@ HO-Cap provides the benchmark evaluation for three tasks:
 - **Novel Object Pose Estimation** (MegaPose[^3] and FoundationPose[^4])
 - **Novel Object Detection** (CNOS[^5] and GroundingDINO[^6]).
 
-The benchmark evaluation example results are stored under the ./config/benchmarks directory. If the evaluation results are saved in the same format, the evaluation codes below can be used to evaluate the results.
+Run below code to download the example evaluation results:
+
+```bash
+python config/benchmarks/benchmark_downloader.py
+```
+
+If the evaluation results are saved in the same format, the evaluation codes below can be used to evaluate the results.
 
 ### Hand Pose Estimation Evaluation
 
@@ -191,7 +197,8 @@ The benchmark evaluation example results are stored under the ./config/benchmark
    <summary> You should see the following output: </summary>
      
    ```
-   Evaluation results:
+   PCK (0.05)  PCK (0.10)  PCK (0.15)  PCK (0.20)  MPJPE (mm)
+    45.319048   81.247619   91.357143   95.080952   25.657379
    ```
    
    </details>
