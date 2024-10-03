@@ -1,3 +1,3 @@
 [submodule "external/XMem"]
 	path = external/XMem
-	url = git@github.com:hkchengrex/XMem.git
+	url = https://github.com/hkchengrex/XMem.git
