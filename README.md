@@ -209,7 +209,7 @@ If the evaluation results are saved in the same format, the evaluation codes bel
 - Evaluate the novel object pose estimation performance:
    
    ```bash
-   python examples/evaluate_novel_object_pose.py
+   python examples/evaluate_object_pose.py
    ```
 
    <details>
@@ -288,7 +288,7 @@ If the evaluation results are saved in the same format, the evaluation codes bel
 - Evaluate the novel object detection performance:
    
    ```bash
-   python examples/evaluate_novel_object_detection.py
+   python examples/evaluate_object_detection.py
    ```
 
    <details>
