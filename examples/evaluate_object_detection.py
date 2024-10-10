@@ -36,7 +36,7 @@ def evaluate_object_detection_results(gt_file, dt_file):
 if __name__ == "__main__":
     benchmark_dir = PROJ_ROOT / "data/benchmarks"
 
-    gt_file = PROJ_ROOT / "config/benchmarks/gt_object_detection_results.json"
+    gt_file = PROJ_ROOT / "config/benchmarks/gt_object_detections_results.json"
     dt_file = PROJ_ROOT / "config/benchmarks/demo_object_detections_results.json"
 
     tqdm.write("- Evaluating Object Detection results...")
