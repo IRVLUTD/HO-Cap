@@ -1,16 +1,22 @@
 # HOCap Toolkit
 
-[![Python 3.10](https://img.shields.io/badge/Python-3.10-3776AB.svg)](https://www.python.org/downloads/release/python-31015/) [![PyTorch 2.3.1](https://img.shields.io/badge/PyTorch-2.3.1-EE4C2C.svg)](https://pytorch.org/) [![CUDA 11.8](https://img.shields.io/badge/CUDA-11.8-76B900.svg)](https://developer.nvidia.com/cuda-toolkit/) [![ROS Melodic](https://img.shields.io/badge/ROS-Melodic-22314E.svg)](http://wiki.ros.org/melodic/) ![GPLv3.0 License](https://img.shields.io/badge/License-GPL--3.0-3DA639.svg)
+[![Python 3.10](https://img.shields.io/badge/Python-3.10-3776AB.svg)](https://www.python.org/downloads/release/python-31015/) [![PyTorch 2.3.1](https://img.shields.io/badge/PyTorch-2.3.1-EE4C2C.svg)](https://pytorch.org/) [![CUDA 11.8](https://img.shields.io/badge/CUDA-11.8-76B900.svg)](https://developer.nvidia.com/cuda-toolkit/) [![ROS Melodic](https://img.shields.io/badge/ROS1-Melodic-22314E.svg)](http://wiki.ros.org/melodic/) [![GPLv3.0 License](https://img.shields.io/badge/License-GPL--3.0-3DA639.svg)](./LICENSE)
 
 The HOCap Toolkit is a Python package that provides evaluation and visualization tools for the HO-Cap dataset.
 
 ---
 
-**HO-Cap: A Capture System and Dataset for 3D Reconstruction and Pose Tracking of Hand-Object Interaction**
-
-Jikai Wang, Qifan Zhang, Yu-Wei Chao, Bowen Wen, Xiaohu Guo, Yu Xiang
-
-[ [arXiv](https://arxiv.org/abs/2406.06843) ] [ [Project page](https://irvlutd.github.io/HOCap/) ]
+<div align=center>
+  <H2>HO-Cap: A Capture System and Dataset for3D Reconstruction and Pose Tracking of Hand-Object Interaction</H2>
+  <b>NeurIPS 2025, Datasets and Benchmarks Track</b>
+  <p>Jikai Wang, Qifan Zhang, Yu-Wei Chao, Bowen Wen, Xiaohu Guo, Yu Xiang</p>
+  <a src="https://img.shields.io/badge/project-website-green" href="https://irvlutd.github.io/HOCap/">
+    <img src="https://img.shields.io/badge/project-website-green">
+  </a>
+  <a src="https://img.shields.io/badge/paper-arxiv-red" href="https://arxiv.org/abs/2406.06843">
+    <img src="https://img.shields.io/badge/paper-arxiv-red">
+  </a>
+</div>
 
 ![hocap-demo-video](./assets/ho-cap-demo-all-cameras.gif)
 
@@ -20,9 +26,8 @@ Jikai Wang, Qifan Zhang, Yu-Wei Chao, Bowen Wen, Xiaohu Guo, Yu Xiang
 
 - [HOCap Toolkit](#hocap-toolkit)
   - [Contents](#contents)
-  - [News](#news)
-  - [BibTeX Citation](#bibtex-citation)
-    - [License](#license)
+  - [Citation](#citation)
+  - [License](#license)
   - [Installation](#installation)
   - [Download the HOCap Dataset](#download-the-hocap-dataset)
   - [Labels in the HOCap Dataset](#labels-in-the-hocap-dataset)
@@ -33,33 +38,21 @@ Jikai Wang, Qifan Zhang, Yu-Wei Chao, Bowen Wen, Xiaohu Guo, Yu Xiang
     - [Object Detection Evaluation](#object-detection-evaluation)
   - [HOCap Dataset Split for Training and Testing](#hocap-dataset-split-for-training-and-testing)
 
-## News
-
-- :warning::warning: **2025-01-13**: We fixed the bug in image labels for "hand_joints_3d" and "hand_joints_2d". Please **re-download** the [labels](https://utdallas.box.com/s/ayd4st2wo588z2yqbuxalptxnz2qxlj5) and **regenerate** the HPE split dataset.
-- **2025-01-13**: The code for image label visualization is added! Please check the [here](#loading-dataset-and-visualizing-samples) (item 4).
-- **2024-12-15**: The training codes and datasets for YOLO11 and RT-DETR are added! Please check the [here](#training-yolo11-and-rt-detr-for-object-detection).
-- **2024-12-15**: The Object Collection dataset is added! Please check the [project page](https://irvlutd.github.io/HOCap/) for more details.
-- **2024-12-14**: The Object Collection dataset is added! Please check the [project page](https://irvlutd.github.io/HOCap/) for more details.
-- **2024-12-14**: The HO-Cap dataset is updated! Please check the [project page](https://irvlutd.github.io/HOCap/) for more details.
-- **2024-06-24**: The HO-Cap dataset is released! Please check the [project page](https://irvlutd.github.io/HOCap/) for more details.
-
-## BibTeX Citation
+## Citation
 
 If HO-Cap helps your research, please consider citing the following:
 
 ```
-@misc{wang2024hocapcapturedataset3d,
-      title={HO-Cap: A Capture System and Dataset for 3D Reconstruction and Pose Tracking of Hand-Object Interaction},
-      author={Jikai Wang and Qifan Zhang and Yu-Wei Chao and Bowen Wen and Xiaohu Guo and Yu Xiang},
-      year={2024},
-      eprint={2406.06843},
-      archivePrefix={arXiv},
-      primaryClass={cs.CV},
-      url={https://arxiv.org/abs/2406.06843},
+@inproceedings{wang2025hocap,
+title={{HO}-Cap: A Capture System and Dataset for 3D Reconstruction and Pose Tracking of Hand-Object Interaction},
+author={Jikai Wang and Qifan Zhang and Yu-Wei Chao and Bowen Wen and Xiaohu Guo and Yu Xiang},
+booktitle={The Thirty-ninth Annual Conference on Neural Information Processing Systems Datasets and Benchmarks Track},
+year={2025},
+url={https://openreview.net/forum?id=hpu6r8oLw9}
 }
 ```
 
-### License
+## License
 
 HOCap Toolkit is released under the [GNU General Public License v3.0](./LICENSE).
 
@@ -94,7 +87,7 @@ This code is tested with [Python 3.10](https://docs.python.org/3.10) and [CUDA 1
 5. Install Pytorch and torchvision
 
    ```bash
-   python -m pip install torch==2.3.1 torchvision==0.18.1 --index-url https://download.pytorch.org/whl/cu118 --no-cache-dir
+   python -m pip install torch==2.3.1 torchvision==0.18.1 --index-url https://download.pytorch.org/whl/cu118
    ```
 
 6. Install hocap-toolkit package.
@@ -221,9 +214,9 @@ The HOCap dataset provides the following labels:
 
 HO-Cap provides the benchmark evaluation for three tasks:
 
-- **Hand Pose Estimation (HPE)** (A2J-Transformer[^1] and HaMeR[^2])
-- **Object Pose Estimation (OPE)** (MegaPose[^3] and FoundationPose[^4])
-- **Object Detection (ODET)** (CNOS[^5], GroundingDINO[^6], YOLO11[^7] and RT-DETR[^8]).
+- **Hand Pose Estimation (HPE)** (A2J-Transformer[^1], InterWild[^2] and HaMeR[^3])
+- **Object Pose Estimation (OPE)** (MegaPose[^4] and FoundationPose[^5])
+- **Object Detection (ODET)** (CNOS[^6], GroundingDINO[^7], YOLO11[^8] and RT-DETR[^9]).
 
 Run below code to download the example evaluation results:
 
@@ -345,16 +338,18 @@ Or run below code to split the HOCap dataset manually, the split dataset will be
 
 [^1]: [A2J-Transformer: Anchor-to-Joint Transformer Network for 3D Interacting Hand Pose Estimation from a Single RGB Image](https://arxiv.org/abs/2304.03635)
 
-[^2]: [Reconstructing Hands in 3D with Transformers](https://arxiv.org/abs/2312.05251)
+[^2]: [Bringing Inputs to Shared Domains for 3D Interacting Hands Recovery in the Wild](https://arxiv.org/abs/2303.13652)
 
-[^3]: [MegaPose: 6D Pose Estimation of Novel Objects via Render & Compare](https://arxiv.org/abs/2212.06870)
+[^3]: [Reconstructing Hands in 3D with Transformers](https://arxiv.org/abs/2312.05251)
 
-[^4]: [FoundationPose: Unified 6D Pose Estimation and Tracking of Novel Objects](https://arxiv.org/abs/2312.08344)
+[^4]: [MegaPose: 6D Pose Estimation of Novel Objects via Render & Compare](https://arxiv.org/abs/2212.06870)
 
-[^5]: [CNOS: A Strong Baseline for CAD-based Novel Object Segmentation](http://arxiv.org/abs/2307.11067)
+[^5]: [FoundationPose: Unified 6D Pose Estimation and Tracking of Novel Objects](https://arxiv.org/abs/2312.08344)
 
-[^6]: [Grounding DINO: Marrying DINO with Grounded Pre-Training for Open-Set Object Detection](https://arxiv.org/abs/2303.05499)
+[^6]: [CNOS: A Strong Baseline for CAD-based Novel Object Segmentation](http://arxiv.org/abs/2307.11067)
 
-[^7]: [YOLOv11: An Overview of the Key Architectural Enhancements](https://arxiv.org/html/2410.17725v1)
+[^7]: [Grounding DINO: Marrying DINO with Grounded Pre-Training for Open-Set Object Detection](https://arxiv.org/abs/2303.05499)
 
-[^8]: [DETRs Beat YOLOs on Real-time Object Detection](https://arxiv.org/abs/2304.08069)
+[^8]: [YOLOv11: An Overview of the Key Architectural Enhancements](https://arxiv.org/html/2410.17725v1)
+
+[^9]: [DETRs Beat YOLOs on Real-time Object Detection](https://arxiv.org/abs/2304.08069)
