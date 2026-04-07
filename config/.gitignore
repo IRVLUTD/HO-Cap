@@ -3,3 +3,4 @@
 *.pth
 *.pkl
 benchmarks/*[.json, .txt]
+mano_models

@@ -16,16 +16,16 @@ The HOCap Toolkit is a Python package that provides evaluation and visualization
   <a src="https://img.shields.io/badge/paper-arxiv-red" href="https://arxiv.org/abs/2406.06843">
     <img src="https://img.shields.io/badge/paper-arxiv-red">
   </a>
+  <p><img src="./assets/ho-cap-demo-all-cameras.gif" width="80%" alt="HO-Cap Demo Video"></p>
 </div>
 
-![hocap-demo-video](./assets/ho-cap-demo-all-cameras.gif)
+<!-- ![hocap-demo-video](./assets/ho-cap-demo-all-cameras.gif) -->
 
 ---
 
-## Contents
+<h2>Contents</h2>
 
 - [HOCap Toolkit](#hocap-toolkit)
-  - [Contents](#contents)
   - [Citation](#citation)
   - [License](#license)
   - [Installation](#installation)
@@ -64,39 +64,34 @@ This code is tested with [Python 3.10](https://docs.python.org/3.10) and [CUDA 1
 
    ```bash
    git clone https://github.com/IRVLUTD/HO-Cap.git
-   ```
-
-2. Change the current directory to the cloned repository.
-
-   ```bash
    cd HO-Cap
    ```
 
-3. Create conda environment
+2. Create conda environment
 
    ```bash
    conda create -n hocap-toolkit python=3.10
    ```
 
-4. Activate conda environment
+3. Activate conda environment
 
    ```bash
    conda activate hocap-toolkit
    ```
 
-5. Install Pytorch and torchvision
+4. Install Pytorch and torchvision
 
    ```bash
    python -m pip install torch==2.3.1 torchvision==0.18.1 --index-url https://download.pytorch.org/whl/cu118
    ```
 
-6. Install hocap-toolkit package.
+5. Install hocap-toolkit package.
 
    ```bash
    python -m pip install --no-build-isolation -e .
    ```
 
-7. Download MANO models and code (`mano_v1_2.zip`) from the [MANO website](https://mano.is.tue.mpg.de) and place the extracted `.pkl` files under `config/mano_models` directory. The directory should look like this:
+6. Download MANO models and code (`mano_v1_2.zip`) from the [MANO website](https://mano.is.tue.mpg.de) and place the extracted `.pkl` files under `config/mano_models` directory. The directory should look like this:
 
    ```
    ./config/mano_models
